@@ -10,10 +10,27 @@ window.onload = function () {
   canvas.width = GameViewport.WIDTH;
   canvas.height = GameViewport.HEIGHT;
 
-  const ken = document.querySelector("img");
+  const [ken, background] = document.querySelectorAll("img");
+
+  const positon = {
+    x: 0,
+    y: 0,
+  };
+
+  const velocity = {
+    x: 1,
+    y: 0,
+  };
 
   function frame() {
     // window.requestAnimationFrame(frame);
+    positon.x += velocity.x;
+
+    if (positon.x > GameViewport.WIDTH - ken.width || positon.x < 0) {
+      velocity.x = -velocity.x;
+    }
+    // ctx.clearRect(0, 0, GameViewport.WIDTH, GameViewport.WIDTH);
+    ctx.drawImage(background, 0, 0, GameViewport.WIDTH, GameViewport.HEIGHT);
 
     ctx.strokeStyle = "yellow";
     ctx.moveTo(0, 0);
@@ -22,7 +39,7 @@ window.onload = function () {
     ctx.lineTo(0, GameViewport.HEIGHT);
     ctx.stroke();
 
-    ctx.drawImage(ken, 0, 0);
+    ctx.drawImage(ken, positon.x, positon.y);
 
     window.requestAnimationFrame(frame);
   }
