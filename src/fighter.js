@@ -1,5 +1,5 @@
 export class Fighter {
-  constructor(name, position, velocity) {
+  constructor({ name, position, velocity }) {
     this.name = name;
     this.image = new Image();
     this.position = position;
