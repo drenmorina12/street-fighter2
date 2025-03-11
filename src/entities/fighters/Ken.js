@@ -7,6 +7,7 @@ export class Ken extends Fighter {
     this.image = document.querySelector('img[alt="ken"]');
 
     this.frames = new Map([
+      // Move Backwards
       [
         "forwards-1",
         [
@@ -47,6 +48,51 @@ export class Ken extends Fighter {
         [
           [357, 867, 50, 89],
           [25, 86],
+        ],
+      ],
+
+      // Move Backwards
+
+      [
+        "backwards-1",
+        [
+          [417, 868, 61, 87],
+          [35, 85],
+        ],
+      ],
+      [
+        "backwards-2",
+        [
+          [487, 866, 59, 90],
+          [36, 87],
+        ],
+      ],
+      [
+        "backwards-3",
+        [
+          [558, 865, 57, 90],
+          [36, 88],
+        ],
+      ],
+      [
+        "backwards-4",
+        [
+          [629, 864, 58, 90],
+          [38, 89],
+        ],
+      ],
+      [
+        "backwards-5",
+        [
+          [782, 865, 58, 91],
+          [36, 88],
+        ],
+      ],
+      [
+        "backwards-6",
+        [
+          [773, 866, 57, 89],
+          [36, 37],
         ],
       ],
     ]);
