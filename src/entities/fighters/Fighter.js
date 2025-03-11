@@ -6,14 +6,19 @@ export class Fighter {
     this.position = position;
     this.velocity = velocity;
     this.animationFrame = 1;
+    this.animationTimer = 0;
   }
 
   update(time, ctx) {
-    const [, , width] = this.frames.get(`forwards-${this.animationFrame}`);
+    const [[, , width]] = this.frames.get(`forwards-${this.animationFrame}`);
 
-    this.animationFrame++;
-    if (this.animationFrame > 6) {
-      this.animationFrame = 1;
+    if (time.previous > this.animationTimer + 60) {
+      this.animationTimer = time.previous;
+
+      this.animationFrame++;
+      if (this.animationFrame > 6) {
+        this.animationFrame = 1;
+      }
     }
 
     this.position.x += this.velocity.x * time.secondsPassed;
@@ -23,8 +28,20 @@ export class Fighter {
     }
   }
 
+  drawDebug(ctx) {
+    ctx.lineWidth = 1;
+
+    ctx.beginPath();
+    ctx.strokeStyle = "white";
+    ctx.moveTo(this.position.x - 5, this.position.y);
+    ctx.lineTo(this.position.x + 4, this.position.y);
+    ctx.moveTo(this.position.x, this.position.y - 5);
+    ctx.lineTo(this.position.x, this.position.y + 4);
+    ctx.stroke();
+  }
+
   draw(ctx) {
-    const [x, y, width, height] = this.frames.get(
+    const [[x, y, width, height], [originX, originY]] = this.frames.get(
       `forwards-${this.animationFrame}`
     );
 
@@ -34,10 +51,12 @@ export class Fighter {
       y,
       width,
       height,
-      this.position.x,
-      this.position.y,
+      this.position.x - originX,
+      this.position.y - originY,
       width,
       height
     );
+
+    this.drawDebug(ctx);
   }
 }
