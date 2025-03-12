@@ -1,4 +1,5 @@
 import { FighterDirection } from "../../constants/fighter.js";
+import { FighterState } from "../../constants/fighter.js";
 
 export class Fighter {
   constructor({ name, position, direction }) {
@@ -11,17 +12,55 @@ export class Fighter {
     this.animationFrame = 0;
     this.animationTimer = 0;
     this.animations = {};
-    this.state = this.changeState();
+    this.currentState = FighterState.WALK_FORWARDS;
+    this.states = {
+      [FighterState.WALK_FORWARDS]: {
+        init: this.handleWalkForwardInit.bind(this),
+        update: this.handleWalkForwardState.bind(this),
+      },
+      [FighterState.WALK_BACKWARDS]: {
+        init: this.handleWalkBackwardsInit.bind(this),
+        update: this.handleWalkBackwardsState.bind(this),
+      },
+    };
   }
 
-  changeState = () =>
-    this.velocity.x * this.direction < 0 ? "walkBackwards" : "walkForwards";
+  changeState(newState) {
+    // this.velocity.x * this.direction < 0
+    //   ? FighterState.WALK_BACKWARDS
+    //   : FighterState.WALK_FORWARDS;
+
+    this.currentState = newState;
+    this.animationFrame = 0;
+
+    this.states[this.currentState].init();
+  }
+
+  handleWalkForwardInit() {
+    this.velocity.x = 100;
+  }
+
+  handleWalkForwardState() {}
+
+  handleWalkBackwardsInit() {
+    this.velocity.x = -100;
+  }
+
+  handleWalkBackwardsState() {}
+
+  updateStageConstraints(ctx) {
+    const WIDTH = 70;
+
+    if (this.position.x > ctx.canvas.width - WIDTH / 2) {
+      this.position.x = ctx.canvas.width - WIDTH / 2;
+    }
+
+    if (this.position.x < WIDTH / 2) {
+      this.position.x = WIDTH / 2;
+    }
+  }
 
   update(time, ctx) {
-    const [[, , width]] = this.frames.get(
-      this.animations[this.state][this.animationFrame]
-    );
-
     if (time.previous > this.animationTimer + 60) {
       this.animationTimer = time.previous;
 
@@ -33,15 +72,8 @@ export class Fighter {
 
     this.position.x += this.velocity.x * time.secondsPassed;
 
-    if (this.position.x > ctx.canvas.width - width / 2) {
-      this.velocity.x = -100;
-      this.state = this.changeState();
-    }
-
-    if (this.position.x < width / 2) {
-      this.velocity.x = 100;
-      this.state = this.changeState();
-    }
+    this.states[this.currentState].update(time, ctx);
+    this.updateStageConstraints(ctx);
   }
 
   drawDebug(ctx) {
@@ -58,7 +90,7 @@ export class Fighter {
 
   draw(ctx) {
     const [[x, y, width, height], [originX, originY]] = this.frames.get(
-      this.animations[this.state][this.animationFrame]
+      this.animations[this.currentState][this.animationFrame]
     );
 
     ctx.scale(this.direction, 1);
