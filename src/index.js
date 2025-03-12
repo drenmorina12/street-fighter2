@@ -2,6 +2,7 @@ import { Ken } from "./entities/fighters/Ken.js";
 import { Stage } from "./entities/Stage.js";
 import { Ryu } from "./entities/fighters/Ryu.js";
 import { FpsCounter } from "./entities/FpsCounter.js";
+import { STAGE_FLOOR } from "./constants/stage.js";
 
 const GameViewport = {
   WIDTH: 384,
@@ -20,21 +21,21 @@ window.addEventListener("load", function () {
     new Ken({
       position: {
         x: 80,
-        y: 110,
+        y: STAGE_FLOOR,
       },
       velocity: {
-        x: 100,
+        x: 100, //100
         y: 0,
       },
     }),
 
     new Ryu({
       position: {
-        x: 110,
-        y: 110,
+        x: 150,
+        y: STAGE_FLOOR,
       },
       velocity: {
-        x: -100,
+        x: 100,
         y: 0,
       },
     }),
