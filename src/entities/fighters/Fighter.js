@@ -92,10 +92,15 @@ export class Fighter {
   }
 
   updateAnimation(time) {
-    if (time.previous > this.animationTimer + 60) {
+    const animation = this.animations[this.currentState];
+    const [, frameDelay] = animation[this.animationFrame];
+
+    if (time.previous > this.animationTimer + frameDelay) {
       this.animationTimer = time.previous;
 
-      this.animationFrame++;
+      if (frameDelay > 0) {
+        this.animationFrame++;
+      }
       if (this.animationFrame >= this.animations[this.currentState].length) {
         this.animationFrame = 0;
       }
@@ -124,9 +129,9 @@ export class Fighter {
   }
 
   draw(ctx) {
-    const [[x, y, width, height], [originX, originY]] = this.frames.get(
-      this.animations[this.currentState][this.animationFrame]
-    );
+    const [frameKey] = this.animations[this.currentState][this.animationFrame];
+    const [[x, y, width, height], [originX, originY]] =
+      this.frames.get(frameKey);
 
     ctx.scale(this.direction, 1);
     ctx.drawImage(
