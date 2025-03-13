@@ -3,15 +3,44 @@ import { Stage } from "./entities/Stage.js";
 import { Ryu } from "./entities/fighters/Ryu.js";
 import { FpsCounter } from "./entities/FpsCounter.js";
 import { STAGE_FLOOR } from "./constants/stage.js";
-import { FighterDirection } from "./constants/fighter.js";
+import { FighterDirection, FighterState } from "./constants/fighter.js";
+
+function populateMoveDropdown() {
+  const dropdown = document.querySelector("#state-dropdown");
+
+  Object.entries(FighterState).forEach(([, value]) => {
+    const option = document.createElement("option");
+    option.setAttribute("value", value);
+    option.innerText = value;
+    dropdown.appendChild(option);
+  });
+}
+
+function handleFormSubmit(event, fighters) {
+  event.preventDefault();
+
+  const selectedCheckboxes = Array.from(
+    event.target.querySelectorAll("input:checked")
+  ).map((checkbox) => checkbox.value);
+
+  const options = event.target.querySelector("select");
+  fighters.forEach((fighter) => {
+    if (selectedCheckboxes.includes(fighter.name)) {
+      console.log("INSIDE");
+      fighter.changeState(options.value);
+    }
+  });
+}
 
 window.addEventListener("load", function () {
+  populateMoveDropdown();
+
   const canvas = document.querySelector("canvas");
   const ctx = canvas.getContext("2d");
+
   ctx.imageSmoothingEnabled = false;
 
-  const entities = [
-    new Stage(),
+  const fighters = [
     new Ken({
       position: {
         x: 104,
@@ -27,9 +56,9 @@ window.addEventListener("load", function () {
       },
       direction: FighterDirection.LEFT,
     }),
-
-    new FpsCounter(),
   ];
+
+  const entities = [new Stage(), ...fighters, new FpsCounter()];
 
   let frameTime = {
     previous: 0,
@@ -52,5 +81,10 @@ window.addEventListener("load", function () {
       entity.draw(ctx);
     }
   }
+
+  this.document.addEventListener("submit", (event) =>
+    handleFormSubmit(event, fighters)
+  );
+
   window.requestAnimationFrame(frame);
 });
