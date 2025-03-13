@@ -9,6 +9,12 @@ export class Ryu extends Fighter {
 
     // prettier-ignore
     this.frames = new Map([
+      // Idle
+      ["idle-1",[[75, 14, 60, 89],[34, 86]]],
+      ["idle-2",[[7, 14, 59, 90],[33, 87]]],
+      ["idle-3",[[277, 11, 58, 92],[32, 89]]],
+      ["idle-4",[[211, 10, 55, 93],[31, 90]]],
+
       // Move Forwards
       ["forwards-1",[[9, 136, 53, 83],[27, 81]]],
       ["forwards-2",[[78, 131, 60, 89],[35, 86]]],
@@ -27,6 +33,14 @@ export class Ryu extends Fighter {
     ]);
 
     this.animations = {
+      [FighterState.IDLE]: [
+        "idle-1",
+        "idle-2",
+        "idle-3",
+        "idle-4",
+        "idle-3",
+        "idle-2",
+      ],
       [FighterState.WALK_FORWARDS]: [
         "forwards-1",
         "forwards-2",
