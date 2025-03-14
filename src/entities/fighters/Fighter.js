@@ -22,26 +22,40 @@ export class Fighter {
       [FighterState.IDLE]: {
         init: this.handleIdleInit.bind(this),
         update: this.handleIdleState.bind(this),
+        validFrom: [
+          undefined,
+          FighterState.IDLE,
+          FighterState.WALK_FORWARDS,
+          FighterState.WALK_BACKWARDS,
+          FighterState.JUMP_UP,
+          FighterState.JUMP_FORWARDS,
+          FighterState.JUMP_BACKWARDS,
+        ],
       },
       [FighterState.WALK_FORWARDS]: {
         init: this.handleMoveInit.bind(this),
         update: this.handleMoveState.bind(this),
+        validFrom: [FighterState.IDLE, FighterState.WALK_BACKWARDS],
       },
       [FighterState.WALK_BACKWARDS]: {
         init: this.handleMoveInit.bind(this),
         update: this.handleMoveState.bind(this),
+        validFrom: [FighterState.IDLE, FighterState.WALK_FORWARDS],
       },
       [FighterState.JUMP_UP]: {
         init: this.handleJumpInit.bind(this),
         update: this.handleJumpState.bind(this),
+        validFrom: [FighterState.IDLE],
       },
       [FighterState.JUMP_FORWARDS]: {
         init: this.handleJumpInit.bind(this),
         update: this.handleJumpState.bind(this),
+        validFrom: [FighterState.IDLE, FighterState.WALK_FORWARDS],
       },
       [FighterState.JUMP_BACKWARDS]: {
         init: this.handleJumpInit.bind(this),
         update: this.handleJumpState.bind(this),
+        validFrom: [FighterState.IDLE, FighterState.WALK_BACKWARDS],
       },
     };
 
@@ -49,6 +63,13 @@ export class Fighter {
   }
 
   changeState(newState) {
+    if (
+      newState === this.currentState ||
+      !this.states[newState].validFrom.includes(this.currentState)
+    ) {
+      return;
+    }
+
     this.currentState = newState;
     this.animationFrame = 0;
 
