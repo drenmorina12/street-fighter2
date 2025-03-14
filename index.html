@@ -55,34 +55,15 @@
         height: var(--form-content-size);
       }
 
-      main {
-        display: flex;
-        height: calc(100% - var(--form-height));
-      }
-
-      label {
-        color: white;
+      canvas {
+        height: 100%;
       }
     </style>
 
     <script type="module" src="./src/index.js"></script>
   </head>
   <body>
-    <form>
-      <div>
-        <input id="ken" type="checkbox" name="fighter" value="Ken" />
-        <label for="ken">Ken</label>
-      </div>
-      <div>
-        <input id="ryu" type="checkbox" name="fighter" value="Ryu" />
-        <label for="ryu">Ryu</label>
-      </div>
-      <select name="state" id="state-dropdown"></select>
-      <button type="submit">Transition!</button>
-    </form>
-    <main>
-      <canvas width="384" height="224"></canvas>
-    </main>
+    <canvas width="384" height="224"></canvas>
 
     <img src="./images/ken.png" alt="ken" id="ken" />
     <img src="./images/background.jpeg" alt="background" id="background" />
