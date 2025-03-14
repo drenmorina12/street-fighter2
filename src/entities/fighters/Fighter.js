@@ -21,7 +21,7 @@ export class Fighter {
     this.states = {
       [FighterState.IDLE]: {
         init: this.handleIdleInit.bind(this),
-        update: this.handleIdleState.bind(this),
+        update: () => {},
         validFrom: [
           undefined,
           FighterState.IDLE,
@@ -30,16 +30,17 @@ export class Fighter {
           FighterState.JUMP_UP,
           FighterState.JUMP_FORWARDS,
           FighterState.JUMP_BACKWARDS,
+          FighterState.CROUCH_UP,
         ],
       },
       [FighterState.WALK_FORWARDS]: {
         init: this.handleMoveInit.bind(this),
-        update: this.handleMoveState.bind(this),
+        update: () => {},
         validFrom: [FighterState.IDLE, FighterState.WALK_BACKWARDS],
       },
       [FighterState.WALK_BACKWARDS]: {
         init: this.handleMoveInit.bind(this),
-        update: this.handleMoveState.bind(this),
+        update: () => {},
         validFrom: [FighterState.IDLE, FighterState.WALK_FORWARDS],
       },
       [FighterState.JUMP_UP]: {
@@ -56,6 +57,25 @@ export class Fighter {
         init: this.handleJumpInit.bind(this),
         update: this.handleJumpState.bind(this),
         validFrom: [FighterState.IDLE, FighterState.WALK_BACKWARDS],
+      },
+      [FighterState.CROUCH]: {
+        init: () => {},
+        update: () => {},
+        validFrom: [FighterState.CROUCH_DOWN],
+      },
+      [FighterState.CROUCH_DOWN]: {
+        init: () => {},
+        update: this.handleCrouchDownState.bind(this),
+        validFrom: [
+          FighterState.IDLE,
+          FighterState.WALK_FORWARDS,
+          FighterState.WALK_BACKWARDS,
+        ],
+      },
+      [FighterState.CROUCH_UP]: {
+        init: () => {},
+        update: this.handleCrouchUpState.bind(this),
+        validFrom: [FighterState.CROUCH],
       },
     };
 
@@ -81,17 +101,25 @@ export class Fighter {
     this.velocity.y = 0;
   }
 
-  handleIdleState() {}
-
   handleMoveInit() {
     this.velocity.x = this.initialVelocity.x[this.currentState] ?? 0;
   }
 
-  handleMoveState() {}
-
   handleJumpInit() {
     this.velocity.y = this.initialVelocity.jump;
     this.handleMoveInit();
+  }
+
+  handleCrouchDownState() {
+    if (this.animations[this.currentState][this.animationFrame][1] === -2) {
+      this.changeState(FighterState.CROUCH);
+    }
+  }
+
+  handleCrouchUpState() {
+    if (this.animations[this.currentState][this.animationFrame][1] === -2) {
+      this.changeState(FighterState.IDLE);
+    }
   }
 
   handleJumpState(time) {
