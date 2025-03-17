@@ -20,6 +20,8 @@ export class Fighter {
 
     this.image = new Image();
 
+    this.opponent;
+
     this.states = {
       [FighterState.IDLE]: {
         init: this.handleIdleInit.bind(this),
@@ -34,6 +36,7 @@ export class Fighter {
           FighterState.JUMP_BACKWARDS,
           FighterState.CROUCH_UP,
           FighterState.JUMP_LAND,
+          FighterState.IDLE_TURN,
         ],
       },
       [FighterState.WALK_FORWARDS]: {
@@ -54,6 +57,7 @@ export class Fighter {
           FighterState.WALK_FORWARDS,
           FighterState.WALK_BACKWARDS,
           FighterState.JUMP_LAND,
+          FighterState.IDLE_TURN,
         ],
       },
       [FighterState.JUMP_UP]: {
@@ -83,7 +87,7 @@ export class Fighter {
       [FighterState.CROUCH]: {
         init: () => {},
         update: this.handleCrouchState.bind(this),
-        validFrom: [FighterState.CROUCH_DOWN],
+        validFrom: [FighterState.CROUCH_DOWN, FighterState.CROUCH_TURN],
       },
       [FighterState.CROUCH_DOWN]: {
         init: this.handleCrouchDownInit.bind(this),
@@ -99,10 +103,30 @@ export class Fighter {
         update: this.handleCrouchUpState.bind(this),
         validFrom: [FighterState.CROUCH],
       },
+      [FighterState.IDLE_TURN]: {
+        init: () => {},
+        update: this.handleIdleTurnState.bind(this),
+        validFrom: [
+          FighterState.IDLE,
+          FighterState.JUMP_LAND,
+          FighterState.WALK_BACKWARDS,
+          FighterState.WALK_FORWARDS,
+        ],
+      },
+      [FighterState.CROUCH_TURN]: {
+        init: () => {},
+        update: this.handleCrouchTurnState.bind(this),
+        validFrom: [FighterState.CROUCH],
+      },
     };
 
     this.changeState(FighterState.IDLE);
   }
+
+  getDirection = () =>
+    this.position.x >= this.opponent.position.x
+      ? FighterDirection.LEFT
+      : FighterDirection.RIGHT;
 
   changeState(newState) {
     if (
@@ -130,7 +154,6 @@ export class Fighter {
   handleJumpInit() {
     this.velocity.y = this.initialVelocity.jump;
     this.handleMoveInit();
-    console.log("JUMP");
   }
 
   handleIdleState() {
@@ -146,6 +169,13 @@ export class Fighter {
     if (control.isForward(this.playerId, this.direction)) {
       this.changeState(FighterState.WALK_FORWARDS);
     }
+
+    const newDirection = this.getDirection();
+
+    if (newDirection !== this.direction) {
+      this.direction = newDirection;
+      this.changeState(FighterState.IDLE_TURN);
+    }
   }
 
   handleWalkForwardState() {
@@ -158,6 +188,8 @@ export class Fighter {
     if (control.isDown(this.playerId)) {
       this.changeState(FighterState.CROUCH_DOWN);
     }
+
+    this.direction = this.getDirection();
   }
 
   handleWalkBackwardsState() {
@@ -170,6 +202,7 @@ export class Fighter {
     if (control.isDown(this.playerId)) {
       this.changeState(FighterState.CROUCH_DOWN);
     }
+    this.direction = this.getDirection();
   }
 
   handleCrouchDownInit() {
@@ -180,10 +213,16 @@ export class Fighter {
     if (!control.isDown(this.playerId)) {
       this.changeState(FighterState.CROUCH_UP);
     }
+
+    const newDirection = this.getDirection();
+
+    if (newDirection !== this.direction) {
+      this.direction = newDirection;
+      this.changeState(FighterState.CROUCH_TURN);
+    }
   }
 
   handleCrouchDownState() {
-    console.log("CROUCHH");
     if (this.animations[this.currentState][this.animationFrame][1] === -2) {
       this.changeState(FighterState.CROUCH);
     }
@@ -229,15 +268,42 @@ export class Fighter {
       return;
     }
 
+    let newState = FighterState.IDLE;
+
     if (!control.isIdle(this.playerId)) {
+      this.direction = this.getDirection();
       this.handleIdleState();
-    } else if (
-      this.animations[this.currentState][this.animationFrame][1] !== -2
-    ) {
-      return;
+    } else {
+      const newDirection = this.getDirection();
+      if (newDirection !== this.direction) {
+        this.direction = newDirection;
+        newState = FighterState.IDLE_TURN;
+      } else {
+        if (this.animations[this.currentState][this.animationFrame][1] !== -2) {
+          return;
+        }
+      }
     }
 
+    this.changeState(newState);
+  }
+
+  handleIdleTurnState() {
+    this.handleIdleState();
+
+    if (this.animations[this.currentState][this.animationFrame][1] !== -2) {
+      return;
+    }
     this.changeState(FighterState.IDLE);
+  }
+
+  handleCrouchTurnState() {
+    this.handleCrouchState();
+
+    if (this.animations[this.currentState][this.animationFrame][1] !== -2) {
+      return;
+    }
+    this.changeState(FighterState.CROUCH);
   }
 
   updateStageConstraints(ctx) {
