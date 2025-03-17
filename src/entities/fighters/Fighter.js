@@ -45,20 +45,29 @@ export class Fighter {
         update: this.handleWalkBackwardsState.bind(this),
         validFrom: [FighterState.IDLE, FighterState.WALK_FORWARDS],
       },
+      [FighterState.JUMP_START]: {
+        init: this.handleJumpStartInit.bind(this),
+        update: this.handleJumpStartState.bind(this),
+        validFrom: [
+          FighterState.IDLE,
+          FighterState.WALK_FORWARDS,
+          FighterState.WALK_BACKWARDS,
+        ],
+      },
       [FighterState.JUMP_UP]: {
         init: this.handleJumpInit.bind(this),
         update: this.handleJumpState.bind(this),
-        validFrom: [FighterState.IDLE],
+        validFrom: [FighterState.JUMP_START],
       },
       [FighterState.JUMP_FORWARDS]: {
         init: this.handleJumpInit.bind(this),
         update: this.handleJumpState.bind(this),
-        validFrom: [FighterState.IDLE, FighterState.WALK_FORWARDS],
+        validFrom: [FighterState.JUMP_START],
       },
       [FighterState.JUMP_BACKWARDS]: {
         init: this.handleJumpInit.bind(this),
         update: this.handleJumpState.bind(this),
-        validFrom: [FighterState.IDLE, FighterState.WALK_BACKWARDS],
+        validFrom: [FighterState.JUMP_START],
       },
       [FighterState.CROUCH]: {
         init: () => {},
@@ -115,7 +124,7 @@ export class Fighter {
 
   handleIdleState() {
     if (control.isUp(this.playerId)) {
-      this.changeState(FighterState.JUMP_UP);
+      this.changeState(FighterState.JUMP_START);
     }
     if (control.isDown(this.playerId)) {
       this.changeState(FighterState.CROUCH_DOWN);
@@ -133,7 +142,7 @@ export class Fighter {
       this.changeState(FighterState.IDLE);
     }
     if (control.isUp(this.playerId)) {
-      this.changeState(FighterState.JUMP_FORWARDS);
+      this.changeState(FighterState.JUMP_START);
     }
     if (control.isDown(this.playerId)) {
       this.changeState(FighterState.CROUCH_DOWN);
@@ -145,7 +154,7 @@ export class Fighter {
       this.changeState(FighterState.IDLE);
     }
     if (control.isUp(this.playerId)) {
-      this.changeState(FighterState.JUMP_BACKWARDS);
+      this.changeState(FighterState.JUMP_START);
     }
     if (control.isDown(this.playerId)) {
       this.changeState(FighterState.CROUCH_DOWN);
@@ -181,6 +190,22 @@ export class Fighter {
     if (this.position.y > STAGE_FLOOR) {
       this.position.y = STAGE_FLOOR;
       this.changeState(FighterState.IDLE);
+    }
+  }
+
+  handleJumpStartInit() {
+    this.handleIdleInit();
+  }
+
+  handleJumpStartState() {
+    if (this.animations[this.currentState][this.animationFrame][1] === -2) {
+      if (control.isBackward(this.playerId, this.direction)) {
+        this.changeState(FighterState.JUMP_BACKWARDS);
+      } else if (control.isForward(this.playerId, this.direction)) {
+        this.changeState(FighterState.JUMP_FORWARDS);
+      } else {
+        this.changeState(FighterState.JUMP_UP);
+      }
     }
   }
 
