@@ -110,6 +110,7 @@ export class Fighter {
   handleJumpInit() {
     this.velocity.y = this.initialVelocity.jump;
     this.handleMoveInit();
+    console.log("JUMP");
   }
 
   handleIdleState() {
@@ -162,6 +163,7 @@ export class Fighter {
   }
 
   handleCrouchDownState() {
+    console.log("CROUCHH");
     if (this.animations[this.currentState][this.animationFrame][1] === -2) {
       this.changeState(FighterState.CROUCH);
     }
