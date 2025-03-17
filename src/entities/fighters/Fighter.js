@@ -157,7 +157,7 @@ export class Fighter {
 
   handleCrouchState() {
     if (!control.isDown(this.playerId)) {
-      this.changeState(FighterState.CROUCH_DOWN);
+      this.changeState(FighterState.CROUCH_UP);
     }
   }
 
