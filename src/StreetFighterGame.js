@@ -16,6 +16,7 @@ export class StreetFighterGame {
           y: STAGE_FLOOR,
         },
         direction: FighterDirection.RIGHT,
+        playerId: 1,
       }),
 
       new Ryu({
@@ -24,6 +25,7 @@ export class StreetFighterGame {
           y: STAGE_FLOOR,
         },
         direction: FighterDirection.LEFT,
+        playerId: 0,
       }),
     ];
 

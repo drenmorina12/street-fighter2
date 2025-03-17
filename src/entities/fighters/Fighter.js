@@ -1,12 +1,12 @@
 import { FighterDirection } from "../../constants/fighter.js";
 import { FighterState } from "../../constants/fighter.js";
 import { STAGE_FLOOR } from "../../constants/stage.js";
-import { isKeyDown } from "../../InputHandler.js";
-import { isKeyUp } from "../../InputHandler.js";
+import * as control from "../../InputHandler.js";
 
 export class Fighter {
-  constructor({ name, position, direction }) {
+  constructor({ name, position, direction, playerId }) {
     this.name = name;
+    this.playerId = playerId;
     this.position = position;
     this.velocity = { x: 0, y: 0 };
     this.initialVelocity = {};
@@ -113,22 +113,23 @@ export class Fighter {
   }
 
   handleIdleState() {
-    if (isKeyDown("ArrowLeft")) {
+    console.log(control.isLeft(this.playerId));
+    if (control.isLeft(this.playerId)) {
       this.changeState(FighterState.WALK_BACKWARDS);
     }
-    if (isKeyDown("ArrowRight")) {
+    if (control.isRight(this.playerId)) {
       this.changeState(FighterState.WALK_FORWARDS);
     }
   }
 
   handleWalkForwardState() {
-    if (isKeyUp("ArrowRight")) {
+    if (!control.isRight(this.playerId)) {
       this.changeState(FighterState.IDLE);
     }
   }
 
   handleWalkBackwardsState() {
-    if (isKeyUp("ArrowLeft")) {
+    if (!control.isLeft(this.playerId)) {
       this.changeState(FighterState.IDLE);
     }
   }
