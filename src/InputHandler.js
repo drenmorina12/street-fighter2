@@ -4,7 +4,14 @@ import { FighterDirection } from "./constants/fighter.js";
 const heldKeys = new Set();
 const gamePads = new Map();
 
+const mappedKeys = controls
+  .map(({ keyboard }) => Object.values(keyboard))
+  .flat();
+
 function handleKeyDown(event) {
+  if (!mappedKeys.includes(event.code)) {
+    return;
+  }
   event.preventDefault();
 
   heldKeys.add(event.code);
