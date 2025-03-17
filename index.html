@@ -16,8 +16,6 @@
       body {
         display: flex;
         flex-direction: column;
-        --form-height: 6rem;
-        --form-content-size: 2rem;
       }
 
       body,
@@ -36,25 +34,6 @@
         display: none;
       }
 
-      form {
-        display: flex;
-        flex-wrap: wrap;
-        width: 100%;
-        justify-content: center;
-        align-items: center;
-        gap: var(--form-content-size);
-        height: var(--form-height);
-      }
-
-      form * {
-        font-size: var(--form-content-size);
-      }
-
-      input[type="checkbox"] {
-        width: var(--form-content-size);
-        height: var(--form-content-size);
-      }
-
       canvas {
         height: 100%;
       }
@@ -66,6 +45,7 @@
     <canvas width="384" height="224"></canvas>
 
     <img src="./images/ken.png" alt="ken" id="ken" />
+    <img src="images/shadow.png" alt="shadow" />
     <img src="./images/background.jpeg" alt="background" id="background" />
     <img src="./images/ryu.png" alt="ryu" id="ryu" />
   </body>

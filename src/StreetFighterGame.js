@@ -5,6 +5,7 @@ import { FpsCounter } from "./entities/FpsCounter.js";
 import { STAGE_FLOOR } from "./constants/stage.js";
 import { FighterDirection } from "./constants/fighter.js";
 import { registerKeyboardEvents } from "./InputHandler.js";
+import { Shadow } from "./entities/fighters/Shadow.js";
 
 export class StreetFighterGame {
   constructor() {
@@ -29,7 +30,12 @@ export class StreetFighterGame {
       }),
     ];
 
-    this.entities = [new Stage(), ...this.fighters, new FpsCounter()];
+    this.entities = [
+      new Stage(),
+      ...this.fighters.map((fighter) => new Shadow(fighter)),
+      ...this.fighters,
+      new FpsCounter(),
+    ];
 
     this.frameTime = {
       previous: 0,
