@@ -113,23 +113,22 @@ export class Fighter {
   }
 
   handleIdleState() {
-    console.log(control.isLeft(this.playerId));
-    if (control.isLeft(this.playerId)) {
+    if (control.isBackward(this.playerId, this.direction)) {
       this.changeState(FighterState.WALK_BACKWARDS);
     }
-    if (control.isRight(this.playerId)) {
+    if (control.isForward(this.playerId, this.direction)) {
       this.changeState(FighterState.WALK_FORWARDS);
     }
   }
 
   handleWalkForwardState() {
-    if (!control.isRight(this.playerId)) {
+    if (!control.isForward(this.playerId, this.direction)) {
       this.changeState(FighterState.IDLE);
     }
   }
 
   handleWalkBackwardsState() {
-    if (!control.isLeft(this.playerId)) {
+    if (!control.isBackward(this.playerId, this.direction)) {
       this.changeState(FighterState.IDLE);
     }
   }
