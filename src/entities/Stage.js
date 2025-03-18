@@ -29,9 +29,24 @@ export class Stage {
     );
   }
 
-  draw(ctx) {
-    this.drawFrame(ctx, "stage-background", -192, -16);
-    this.drawFrame(ctx, "stage-boat", -128, -16);
-    this.drawFrame(ctx, "stage-floor", -256, 160);
+  draw(ctx, camera) {
+    this.drawFrame(
+      ctx,
+      "stage-background",
+      Math.floor(16 - camera.position.x / 2.157303),
+      -camera.position.y
+    );
+    this.drawFrame(
+      ctx,
+      "stage-boat",
+      Math.floor(150 - camera.position.x / 1.613445),
+      -1 - camera.position.y
+    );
+    this.drawFrame(
+      ctx,
+      "stage-floor",
+      Math.floor(192 - camera.position.x),
+      176 - camera.position.y
+    );
   }
 }
