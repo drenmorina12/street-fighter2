@@ -10,6 +10,7 @@ import {
   registerKeyboardEvents,
 } from "./InputHandler.js";
 import { Shadow } from "./entities/fighters/Shadow.js";
+import { StatusBar } from "./entities/overlays/StatusBar.js";
 
 export class StreetFighterGame {
   constructor() {
@@ -42,6 +43,7 @@ export class StreetFighterGame {
       ...this.fighters.map((fighter) => new Shadow(fighter)),
       ...this.fighters,
       new FpsCounter(),
+      new StatusBar(this.fighters),
     ];
 
     this.frameTime = {
