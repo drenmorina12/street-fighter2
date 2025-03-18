@@ -1,5 +1,5 @@
 import { Fighter } from "./Fighter.js";
-import { FighterState, PushBox } from "../../constants/fighter.js";
+import { FighterState, PushBox, FrameDelay } from "../../constants/fighter.js";
 
 export class Ryu extends Fighter {
   constructor({ position, direction, playerId }) {
@@ -94,7 +94,7 @@ export class Ryu extends Fighter {
       ],
       [FighterState.JUMP_START]: [
         ["jump-land", 50],
-        ["jump-land", -2],
+        ["jump-land", FrameDelay.TRANSITION],
       ],
       [FighterState.JUMP_UP]: [
         ["jump-up-1", 180],
@@ -102,7 +102,7 @@ export class Ryu extends Fighter {
         ["jump-up-3", 100],
         ["jump-up-4", 100],
         ["jump-up-5", 100],
-        ["jump-up-6", -1],
+        ["jump-up-6", FrameDelay.TRANSITION],
       ],
       [FighterState.JUMP_FORWARDS]: [
         ["jump-roll-1", 200],
@@ -111,7 +111,7 @@ export class Ryu extends Fighter {
         ["jump-roll-4", 50],
         ["jump-roll-5", 50],
         ["jump-roll-6", 50],
-        ["jump-roll-7", 0],
+        ["jump-roll-7", FrameDelay.FREEZE],
       ],
       [FighterState.JUMP_BACKWARDS]: [
         ["jump-roll-7", 200],
@@ -120,46 +120,46 @@ export class Ryu extends Fighter {
         ["jump-roll-4", 50],
         ["jump-roll-3", 50],
         ["jump-roll-2", 50],
-        ["jump-roll-1", 0],
+        ["jump-roll-1", FrameDelay.FREEZE],
       ],
       [FighterState.JUMP_LAND]: [
         ["jump-land", 33],
         ["jump-land", 117],
-        ["jump-land", -2],
+        ["jump-land", FrameDelay.TRANSITION],
       ],
-      [FighterState.CROUCH]: [["crouch-3", 0]],
+      [FighterState.CROUCH]: [["crouch-3", FrameDelay.FREEZE]],
       [FighterState.CROUCH_DOWN]: [
         ["crouch-1", 30],
         ["crouch-2", 30],
         ["crouch-3", 30],
-        ["crouch-3", -2],
+        ["crouch-3", FrameDelay.TRANSITION],
       ],
       [FighterState.CROUCH_UP]: [
         ["crouch-3", 30],
         ["crouch-2", 30],
         ["crouch-1", 30],
-        ["crouch-1", -2],
+        ["crouch-1", FrameDelay.TRANSITION],
       ],
       [FighterState.IDLE_TURN]: [
         ["idle-turn-3", 33],
         ["idle-turn-2", 33],
         ["idle-turn-1", 33],
-        ["idle-turn-1", -2],
+        ["idle-turn-1", FrameDelay.TRANSITION],
       ],
       [FighterState.CROUCH_TURN]: [
         ["crouch-turn-3", 33],
         ["crouch-turn-2", 33],
         ["crouch-turn-1", 33],
-        ["crouch-turn-1", -2],
+        ["crouch-turn-1", FrameDelay.TRANSITION],
       ],
     };
 
     this.initialVelocity = {
       x: {
-        [FighterState.WALK_FORWARDS]: 200,
-        [FighterState.WALK_BACKWARDS]: -150,
-        [FighterState.JUMP_FORWARDS]: 170,
-        [FighterState.JUMP_BACKWARDS]: -200,
+        [FighterState.WALK_FORWARDS]: 3 * 60,
+        [FighterState.WALK_BACKWARDS]: -(2 * 60),
+        [FighterState.JUMP_FORWARDS]: 48 * 3 + 12 * 2,
+        [FighterState.JUMP_BACKWARDS]: -(45 * 4 + 15 * 3),
       },
       jump: -420,
     };

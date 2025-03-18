@@ -8,9 +8,13 @@ export class FpsCounter {
   }
 
   draw(ctx) {
-    ctx.font = "bold 20px Arial";
-    ctx.fillStyle = "black";
-    ctx.textAlign = "center";
-    ctx.fillText(`FPS: ${this.fps}`, ctx.canvas.width / 2, 30);
+    ctx.font = "14px Arial";
+    ctx.fillStyle = "#00FF00";
+    ctx.textAlign = "right";
+    ctx.fillText(
+      `FPS: ${this.fps}`,
+      ctx.canvas.width - 2,
+      ctx.canvas.height - 2
+    );
   }
 }

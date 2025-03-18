@@ -1,4 +1,8 @@
-import { FighterDirection } from "../../constants/fighter.js";
+import {
+  FighterDirection,
+  FrameDelay,
+  PUSH_FRICTION,
+} from "../../constants/fighter.js";
 import { FighterState } from "../../constants/fighter.js";
 import { STAGE_FLOOR } from "../../constants/stage.js";
 import * as control from "../../InputHandler.js";
@@ -126,6 +130,10 @@ export class Fighter {
     this.changeState(FighterState.IDLE);
   }
 
+  isAnimationCompleted = () =>
+    this.animations[this.currentState][this.animationFrame][1] ===
+    FrameDelay.TRANSITION;
+
   hasCollidedWithOpponent = () =>
     rectsOverlap(
       this.position.x + this.pushBox.x,
@@ -137,6 +145,11 @@ export class Fighter {
       this.opponent.pushBox.width,
       this.opponent.pushBox.height
     );
+
+  resetVelocities() {
+    this.velocity.x = 0;
+    this.velocity.y = 0;
+  }
 
   getDirection() {
     if (
@@ -177,8 +190,7 @@ export class Fighter {
   }
 
   handleIdleInit() {
-    this.velocity.x = 0;
-    this.velocity.y = 0;
+    this.resetVelocities();
   }
 
   handleMoveInit() {
@@ -193,14 +205,11 @@ export class Fighter {
   handleIdleState() {
     if (control.isUp(this.playerId)) {
       this.changeState(FighterState.JUMP_START);
-    }
-    if (control.isDown(this.playerId)) {
+    } else if (control.isDown(this.playerId)) {
       this.changeState(FighterState.CROUCH_DOWN);
-    }
-    if (control.isBackward(this.playerId, this.direction)) {
+    } else if (control.isBackward(this.playerId, this.direction)) {
       this.changeState(FighterState.WALK_BACKWARDS);
-    }
-    if (control.isForward(this.playerId, this.direction)) {
+    } else if (control.isForward(this.playerId, this.direction)) {
       this.changeState(FighterState.WALK_FORWARDS);
     }
 
@@ -215,11 +224,9 @@ export class Fighter {
   handleWalkForwardState() {
     if (!control.isForward(this.playerId, this.direction)) {
       this.changeState(FighterState.IDLE);
-    }
-    if (control.isUp(this.playerId)) {
+    } else if (control.isUp(this.playerId)) {
       this.changeState(FighterState.JUMP_START);
-    }
-    if (control.isDown(this.playerId)) {
+    } else if (control.isDown(this.playerId)) {
       this.changeState(FighterState.CROUCH_DOWN);
     }
 
@@ -229,18 +236,16 @@ export class Fighter {
   handleWalkBackwardsState() {
     if (!control.isBackward(this.playerId, this.direction)) {
       this.changeState(FighterState.IDLE);
-    }
-    if (control.isUp(this.playerId)) {
+    } else if (control.isUp(this.playerId)) {
       this.changeState(FighterState.JUMP_START);
-    }
-    if (control.isDown(this.playerId)) {
+    } else if (control.isDown(this.playerId)) {
       this.changeState(FighterState.CROUCH_DOWN);
     }
     this.direction = this.getDirection();
   }
 
   handleCrouchDownInit() {
-    this.handleIdleInit();
+    this.resetVelocities();
   }
 
   handleCrouchState() {
@@ -257,7 +262,7 @@ export class Fighter {
   }
 
   handleCrouchDownState() {
-    if (this.animations[this.currentState][this.animationFrame][1] === -2) {
+    if (this.isAnimationCompleted()) {
       this.changeState(FighterState.CROUCH);
     }
 
@@ -270,7 +275,7 @@ export class Fighter {
   }
 
   handleCrouchUpState() {
-    if (this.animations[this.currentState][this.animationFrame][1] === -2) {
+    if (this.isAnimationCompleted()) {
       this.changeState(FighterState.IDLE);
     }
   }
@@ -285,11 +290,11 @@ export class Fighter {
   }
 
   handleJumpStartInit() {
-    this.handleIdleInit();
+    this.resetVelocities();
   }
 
   handleJumpStartState() {
-    if (this.animations[this.currentState][this.animationFrame][1] === -2) {
+    if (this.isAnimationCompleted()) {
       if (control.isBackward(this.playerId, this.direction)) {
         this.changeState(FighterState.JUMP_BACKWARDS);
       } else if (control.isForward(this.playerId, this.direction)) {
@@ -301,7 +306,7 @@ export class Fighter {
   }
 
   handleJumpLandInit() {
-    this.handleIdleInit();
+    this.resetVelocities();
   }
 
   handleJumpLandState() {
@@ -320,7 +325,7 @@ export class Fighter {
         this.direction = newDirection;
         newState = FighterState.IDLE_TURN;
       } else {
-        if (this.animations[this.currentState][this.animationFrame][1] !== -2) {
+        if (!this.isAnimationCompleted()) {
           return;
         }
       }
@@ -332,7 +337,7 @@ export class Fighter {
   handleIdleTurnState() {
     this.handleIdleState();
 
-    if (this.animations[this.currentState][this.animationFrame][1] !== -2) {
+    if (!this.isAnimationCompleted()) {
       return;
     }
     this.changeState(FighterState.IDLE);
@@ -341,7 +346,7 @@ export class Fighter {
   handleCrouchTurnState() {
     this.handleCrouchState();
 
-    if (this.animations[this.currentState][this.animationFrame][1] !== -2) {
+    if (!this.isAnimationCompleted()) {
       return;
     }
     this.changeState(FighterState.CROUCH);
@@ -374,7 +379,7 @@ export class Fighter {
             FighterState.JUMP_FORWARDS,
           ].includes(this.opponent.currentState)
         ) {
-          this.opponent.position.x += 66 * time.secondsPassed;
+          this.opponent.position.x += PUSH_FRICTION * time.secondsPassed;
         }
       }
 
@@ -396,7 +401,7 @@ export class Fighter {
             FighterState.JUMP_FORWARDS,
           ].includes(this.opponent.currentState)
         ) {
-          this.opponent.position.x -= 66 * time.secondsPassed;
+          this.opponent.position.x -= PUSH_FRICTION * time.secondsPassed;
         }
       }
     }
@@ -409,7 +414,7 @@ export class Fighter {
     if (time.previous > this.animationTimer + frameDelay) {
       this.animationTimer = time.previous;
 
-      if (frameDelay > 0) {
+      if (frameDelay > FrameDelay.FREEZE) {
         this.animationFrame++;
         this.pushBox = this.getPushBox(frameKey);
       }
