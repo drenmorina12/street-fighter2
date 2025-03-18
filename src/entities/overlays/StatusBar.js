@@ -8,7 +8,7 @@ export class StatusBar {
   constructor(fighters) {
     this.image = document.querySelector('img[alt="misc"]');
 
-    this.time = 20;
+    this.time = 99;
     this.timeTimer = 0;
     this.timeFlashTimer = 0;
     this.useFlashFrames = false;
