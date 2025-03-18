@@ -1,21 +1,33 @@
 import {
+  FIGHTER_START_DISTANCE,
   FighterDirection,
   FrameDelay,
   PUSH_FRICTION,
 } from "../../constants/fighter.js";
 import { FighterState } from "../../constants/fighter.js";
-import { STAGE_FLOOR } from "../../constants/stage.js";
+import {
+  STAGE_FLOOR,
+  STAGE_MID_POINT,
+  STAGE_PADDING,
+} from "../../constants/stage.js";
 import * as control from "../../InputHandler.js";
 import { rectsOverlap } from "../../utils/collisions.js";
 
 export class Fighter {
-  constructor({ name, position, direction, playerId }) {
+  constructor({ name, playerId }) {
     this.name = name;
     this.playerId = playerId;
-    this.position = position;
+    this.position = {
+      x:
+        STAGE_MID_POINT +
+        STAGE_PADDING +
+        (playerId === 1 ? -FIGHTER_START_DISTANCE : FIGHTER_START_DISTANCE),
+      y: STAGE_FLOOR,
+    };
     this.velocity = { x: 0, y: 0 };
     this.initialVelocity = {};
-    this.direction = direction;
+    this.direction =
+      playerId === 0 ? FighterDirection.RIGHT : FighterDirection.LEFT;
     this.gravity = 0;
 
     this.frames = new Map();
