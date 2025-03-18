@@ -19,7 +19,7 @@ export class StreetFighterGame {
     this.fighters = [
       new Ken({
         position: {
-          x: 104,
+          x: 552,
           y: STAGE_FLOOR,
         },
         direction: FighterDirection.RIGHT,
@@ -28,7 +28,7 @@ export class StreetFighterGame {
 
       new Ryu({
         position: {
-          x: 280,
+          x: 728,
           y: STAGE_FLOOR,
         },
         direction: FighterDirection.LEFT,
