@@ -2,8 +2,15 @@ import { Ken } from "./entities/fighters/Ken.js";
 import { Stage } from "./entities/Stage.js";
 import { Ryu } from "./entities/fighters/Ryu.js";
 import { FpsCounter } from "./entities/FpsCounter.js";
-import { STAGE_FLOOR } from "./constants/stage.js";
-import { FighterDirection } from "./constants/fighter.js";
+import {
+  STAGE_FLOOR,
+  STAGE_MID_POINT,
+  STAGE_PADDING,
+} from "./constants/stage.js";
+import {
+  FIGHTER_START_DISTANCE,
+  FighterDirection,
+} from "./constants/fighter.js";
 import {
   pollGamepads,
   registerGamepadEvents,
@@ -19,7 +26,7 @@ export class StreetFighterGame {
     this.fighters = [
       new Ken({
         position: {
-          x: 552,
+          x: STAGE_MID_POINT + STAGE_PADDING - FIGHTER_START_DISTANCE,
           y: STAGE_FLOOR,
         },
         direction: FighterDirection.RIGHT,
@@ -28,7 +35,7 @@ export class StreetFighterGame {
 
       new Ryu({
         position: {
-          x: 728,
+          x: STAGE_MID_POINT + STAGE_PADDING + FIGHTER_START_DISTANCE,
           y: STAGE_FLOOR,
         },
         direction: FighterDirection.LEFT,
@@ -39,7 +46,11 @@ export class StreetFighterGame {
     this.fighters[0].opponent = this.fighters[1];
     this.fighters[1].opponent = this.fighters[0];
 
-    this.camera = new Camera(448, 16, this.fighters);
+    this.camera = new Camera(
+      STAGE_MID_POINT + STAGE_PADDING - this.ctx.canvas.width / 2,
+      16,
+      this.fighters
+    );
 
     this.entities = [
       new Stage(),
