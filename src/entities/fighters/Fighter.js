@@ -2,6 +2,7 @@ import { FighterDirection } from "../../constants/fighter.js";
 import { FighterState } from "../../constants/fighter.js";
 import { STAGE_FLOOR } from "../../constants/stage.js";
 import * as control from "../../InputHandler.js";
+import { rectsOverlap } from "../../utils/collisions.js";
 
 export class Fighter {
   constructor({ name, position, direction, playerId }) {
@@ -125,10 +126,35 @@ export class Fighter {
     this.changeState(FighterState.IDLE);
   }
 
-  getDirection = () =>
-    this.position.x >= this.opponent.position.x
-      ? FighterDirection.LEFT
-      : FighterDirection.RIGHT;
+  hasCollidedWithOpponent = () =>
+    rectsOverlap(
+      this.position.x + this.pushBox.x,
+      this.position.y + this.pushBox.y,
+      this.pushBox.width,
+      this.pushBox.height,
+      this.opponent.position.x + this.opponent.pushBox.x,
+      this.opponent.position.y + this.opponent.pushBox.y,
+      this.opponent.pushBox.width,
+      this.opponent.pushBox.height
+    );
+
+  getDirection() {
+    if (
+      this.position.x + this.pushBox.x + this.pushBox.width <=
+      this.opponent.position.x + this.opponent.pushBox.x
+    ) {
+      return FighterDirection.RIGHT;
+    } else if (
+      this.position.x + this.pushBox.x >=
+      this.opponent.position.x +
+        this.opponent.pushBox.x +
+        this.opponent.pushBox.width
+    ) {
+      return FighterDirection.LEFT;
+    }
+
+    return this.direction;
+  }
 
   getPushBox(frameKey) {
     const [, [x, y, width, height] = [0, 0, 0, 0]] = this.frames.get(frameKey);
@@ -315,14 +341,33 @@ export class Fighter {
   }
 
   updateStageConstraints(ctx) {
-    const WIDTH = 70;
-
-    if (this.position.x > ctx.canvas.width - WIDTH / 2) {
-      this.position.x = ctx.canvas.width - WIDTH / 2;
+    if (this.position.x > ctx.canvas.width - this.pushBox.width) {
+      this.position.x = ctx.canvas.width - this.pushBox.width;
     }
 
-    if (this.position.x < WIDTH / 2) {
-      this.position.x = WIDTH / 2;
+    if (this.position.x < this.pushBox.width) {
+      this.position.x = this.pushBox.width;
+    }
+
+    if (this.hasCollidedWithOpponent()) {
+      if (this.position.x <= this.opponent.position.x) {
+        this.position.x = Math.max(
+          this.opponent.position.x +
+            this.opponent.pushBox.x -
+            (this.pushBox.x + this.pushBox.width),
+          this.pushBox.width
+        );
+      }
+
+      if (this.position.x >= this.opponent.position.x) {
+        this.position.x = Math.min(
+          this.opponent.position.x +
+            this.opponent.pushBox.x +
+            this.opponent.pushBox.width +
+            (this.pushBox.width + this.pushBox.x),
+          ctx.canvas.width - this.pushBox.width
+        );
+      }
     }
   }
 
