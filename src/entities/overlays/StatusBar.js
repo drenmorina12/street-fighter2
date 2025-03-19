@@ -46,7 +46,12 @@ export class StatusBar {
       [`${TIME_FRAME_KEYS[1]}-8`, [144, 192, 14, 16]],  
       [`${TIME_FRAME_KEYS[1]}-9`, [160, 192, 14, 16]], 
       
-      
+      // Numeric
+      ["score-1", [29, 101, 10, 10]],
+      ["score-2", [41, 101, 10, 10]],
+
+      // Alpha
+      ["score-P",  [17, 125, 10, 10]],
 
       // Name Tags
       ["tag-ken", [128, 56, 30, 9]],
@@ -55,10 +60,6 @@ export class StatusBar {
 
     const [{ name: name1 }, { name: name2 }] = this.fighters;
     this.names = [`tag-${name1.toLowerCase()}`, `tag-${name2.toLowerCase()}`];
-  }
-
-  drawFrame(ctx, frameKey, x, y, direction = 1) {
-    drawFrame(ctx, this.image, this.frames.get(frameKey), x, y, direction);
   }
 
   updateTime(time) {
@@ -81,6 +82,10 @@ export class StatusBar {
     this.updateTime(time);
   }
 
+  drawFrame(ctx, frameKey, x, y, direction = 1) {
+    drawFrame(ctx, this.image, this.frames.get(frameKey), x, y, direction);
+  }
+
   drawHealthBars(ctx) {
     this.drawFrame(ctx, "health-bar", 31, 20);
     this.drawFrame(ctx, "ko-white", 176, 18);
@@ -101,7 +106,28 @@ export class StatusBar {
     this.drawFrame(ctx, name2, 322, 33);
   }
 
+  drawScore(ctx, score, x) {
+    const strValue = String(score);
+    const buffer = 6 * 12 - strValue.length * 12;
+
+    for (let i = 0; i < strValue.length; i++) {
+      this.drawFrame(ctx, `score-${strValue[i]}`, x + buffer + i * 12, 1);
+    }
+  }
+
+  drawScores(ctx) {
+    this.drawFrame(ctx, "score-1", 4, 1);
+    this.drawFrame(ctx, "score-P", 17, 1);
+
+    this.drawFrame(ctx, "score-2", 269, 1);
+    this.drawFrame(ctx, "score-P", 281, 1);
+
+    this.drawScore(ctx, 1, 45);
+    this.drawScore(ctx, 1, 309);
+  }
+
   draw(ctx) {
+    this.drawScores(ctx);
     this.drawHealthBars(ctx);
     this.drawTime(ctx);
     this.drawNameTags(ctx);
