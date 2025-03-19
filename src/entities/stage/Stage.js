@@ -1,4 +1,5 @@
 import { FRAME_TIME } from "../../constants/game.js";
+import { STAGE_PADDING } from "../../constants/stage.js";
 import { drawFrame } from "../../utils/context.js";
 import { BackgroundAnimation } from "./shared/BackgroundAnimation.js";
 import { SkewedFloor } from "./shared/SkewedFloor.js";
@@ -6,13 +7,13 @@ import { SkewedFloor } from "./shared/SkewedFloor.js";
 export class Stage {
   constructor() {
     this.image = document.querySelector('img[alt="stage"]');
-    this.floor = new SkewedFloor(this.image, [8, 392, 896, 72]);
+    this.floor = new SkewedFloor(this.image, [8, 392, 896, 56]);
 
     // prettier-ignore
     this.frames = new Map([
       ["stage-background", [72, 208, 768, 176]],
       ["stage-boat", [8, 16, 521, 180]],
-      ["stage-floor", [8, 392, 896, 72]],
+      ["stage-floor-bottom", [8, 448, 896, 16]],
 
       // Grey Suit Man
       ["grey-suit-1", [600, 24, 16, 24]],
@@ -248,9 +249,20 @@ export class Stage {
     );
   }
 
+  drawFloor(ctx, camera) {
+    this.floor.draw(ctx, camera, 176);
+
+    this.drawFrame(
+      ctx,
+      "stage-floor-bottom",
+      STAGE_PADDING - camera.position.x * 1.1,
+      232 - camera.position.y
+    );
+  }
+
   draw(ctx, camera) {
     this.drawSkyOcean(ctx, camera);
     this.drawBoat(ctx, camera);
-    this.floor.draw(ctx, camera, 176);
+    this.drawFloor(ctx, camera);
   }
 }
