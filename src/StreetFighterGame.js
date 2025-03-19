@@ -15,6 +15,8 @@ import { getContext } from "./utils/context.js";
 
 export class StreetFighterGame {
   constructor() {
+    this.stage = new Stage();
+
     this.ctx = getContext();
     this.fighters = [
       new Ken({
@@ -36,7 +38,6 @@ export class StreetFighterGame {
     );
 
     this.entities = [
-      new Stage(),
       ...this.fighters.map((fighter) => new Shadow(fighter)),
       ...this.fighters,
       new FpsCounter(),
@@ -51,6 +52,7 @@ export class StreetFighterGame {
 
   update() {
     this.camera.update(this.frameTime, this.ctx);
+    this.stage.update(this.frameTime, this.ctx);
 
     for (const entity of this.entities) {
       entity.update(this.frameTime, this.ctx, this.camera);
@@ -58,9 +60,13 @@ export class StreetFighterGame {
   }
 
   draw() {
+    this.stage.drawBackground(this.ctx, this.camera);
+
     for (const entity of this.entities) {
       entity.draw(this.ctx, this.camera);
     }
+
+    this.stage.drawForeground(this.ctx, this.camera);
   }
 
   frame(time) {
