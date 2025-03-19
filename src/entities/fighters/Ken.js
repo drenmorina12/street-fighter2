@@ -148,10 +148,10 @@ export class Ken extends Fighter {
         ["idle-turn-1", FrameDelay.TRANSITION],
       ],
       [FighterState.CROUCH_TURN]: [
-        ["crouch[-turn-3", 33],
-        ["crouch[-turn-2", 33],
-        ["crouch[-turn-1", 33],
-        ["crouch[-turn-1", FrameDelay.TRANSITION],
+        ["crouch-turn-3", 33],
+        ["crouch-turn-2", 33],
+        ["crouch-turn-1", 33],
+        ["crouch-turn-1", FrameDelay.TRANSITION],
       ],
     };
 
