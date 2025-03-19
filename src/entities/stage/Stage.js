@@ -11,6 +11,10 @@ export class Stage {
       ["stage-background", [72, 208, 768, 176]],
       ["stage-boat", [8, 16, 521, 180]],
       ["stage-floor", [8, 392, 896, 72]],
+
+      // Grey Suit Man
+      ["grey-suit-1", [600, 24, 16, 24]],
+      ["grey-suit-2", [600, 88, 16, 24]],
     ]);
 
     this.flag = new BackgroundAnimation(
@@ -126,6 +130,12 @@ export class Stage {
       ]
     );
 
+    this.greySuitMan = {
+      animationFrame: 0,
+      animationTimer: 0,
+      animationDelay: 0,
+    };
+
     this.boat = {
       position: { x: 0, y: 0 },
       animationFrame: 0,
@@ -150,10 +160,22 @@ export class Stage {
     }
   }
 
+  updateGreySuitMan(time) {
+    if (
+      time.previous >
+      this.greySuitMan.animationTimer + this.greySuitMan.animationDelay
+    ) {
+      this.greySuitMan.animationTimer = time.previous;
+      this.greySuitMan.animationDelay = 700 + Math.random() * 500;
+      this.greySuitMan.animationFrame = !this.greySuitMan.animationFrame;
+    }
+  }
+
   update(time) {
     this.flag.update(time);
     this.updateBoat(time);
     this.baldMan.update(time);
+    this.updateGreySuitMan(time);
     this.cheeringWomen.update(time);
     this.greenJumperGuy.update(time);
     this.blueCoatGuy.update(time);
@@ -190,6 +212,12 @@ export class Stage {
       ctx,
       this.boat.position.x + 128,
       this.boat.position.y + 96
+    );
+    this.drawFrame(
+      ctx,
+      `grey-suit-${this.greySuitMan.animationFrame + 1}`,
+      this.boat.position.x + 167,
+      this.boat.position.y + 112
     );
     this.cheeringWomen.draw(
       ctx,
