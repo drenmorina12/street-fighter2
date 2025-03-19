@@ -4,7 +4,7 @@ import { drawFrame } from "../../utils/context.js";
 import { BackgroundAnimation } from "./shared/BackgroundAnimation.js";
 import { SkewedFloor } from "./shared/SkewedFloor.js";
 
-export class Stage {
+export class KenStage {
   constructor() {
     this.image = document.querySelector('img[alt="stage"]');
     this.floor = new SkewedFloor(this.image, [8, 392, 896, 56]);
@@ -177,7 +177,7 @@ export class Stage {
       this.greySuitMan.animationTimer + this.greySuitMan.animationDelay
     ) {
       this.greySuitMan.animationTimer = time.previous;
-      this.greySuitMan.animationDelay = 700 + Math.random() * 500;
+      this.greySuitMan.animationDelay = 700 + Math.random() * 3000;
       this.greySuitMan.animationFrame = !this.greySuitMan.animationFrame;
     }
   }
@@ -286,20 +286,7 @@ export class Stage {
     );
   }
 
-  drawBackground(ctx, camera) {
-    this.drawSkyOcean(ctx, camera);
-    this.drawBoat(ctx, camera);
-    this.drawFloor(ctx, camera);
-    this.drawSmallBollards(ctx, camera);
-    this.drawFrame(
-      ctx,
-      "barrels",
-      Math.floor(872 - camera.position.x),
-      120 - camera.position.y
-    );
-  }
-
-  drawForeground(ctx, camera) {
+  drawLargeBollards(ctx, camera) {
     const midPoint = STAGE_MID_POINT + STAGE_PADDING;
     const cameraXOffset = camera.position.x / 0.958;
     const y = 200 - camera.position.y;
@@ -316,5 +303,22 @@ export class Stage {
       Math.floor(midPoint + 147 - cameraXOffset),
       y
     );
+  }
+
+  drawBackground(ctx, camera) {
+    this.drawSkyOcean(ctx, camera);
+    this.drawBoat(ctx, camera);
+    this.drawFloor(ctx, camera);
+    this.drawSmallBollards(ctx, camera);
+    this.drawFrame(
+      ctx,
+      "barrels",
+      Math.floor(872 - camera.position.x),
+      120 - camera.position.y
+    );
+  }
+
+  drawForeground(ctx, camera) {
+    this.drawLargeBollards(ctx, camera);
   }
 }
