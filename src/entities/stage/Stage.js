@@ -18,6 +18,14 @@ export class Stage {
       // Grey Suit Man
       ["grey-suit-1", [600, 24, 16, 24]],
       ["grey-suit-2", [600, 88, 16, 24]],
+
+      // Small Bollard
+      ["bollard-small", [800, 184, 21, 16]],
+      ["bollard-large", [760, 176, 31, 24]],
+
+      // Barrels
+      ["barrels", [560, 472, 151, 96]],
+
     ]);
 
     this.flag = new BackgroundAnimation(
@@ -260,9 +268,29 @@ export class Stage {
     );
   }
 
+  drawSmallBollards(ctx, camera) {
+    const cameraXOffset = camera.position.x / 1.54;
+    const y = 166 - camera.position.y;
+
+    this.drawFrame(
+      ctx,
+      "bollard-small",
+      Math.floor(468 - 92 - cameraXOffset),
+      y
+    );
+    this.drawFrame(
+      ctx,
+      "bollard-small",
+      Math.floor(468 + 92 - cameraXOffset),
+      y
+    );
+  }
+
   draw(ctx, camera) {
     this.drawSkyOcean(ctx, camera);
     this.drawBoat(ctx, camera);
     this.drawFloor(ctx, camera);
+    this.drawSmallBollards(ctx, camera);
+    this.drawFrame(ctx, "barrels", Math.floor(872 - camera.position.x), 120 - camera.position.y);
   }
 }
