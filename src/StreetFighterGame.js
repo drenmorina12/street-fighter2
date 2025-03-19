@@ -1,11 +1,8 @@
 import { Ken } from "./entities/fighters/Ken.js";
-import { Stage } from "./entities/Stage.js";
+import { Stage } from "./entities/stage/Stage.js";
 import { Ryu } from "./entities/fighters/Ryu.js";
 import { FpsCounter } from "./entities/FpsCounter.js";
-import {
-  STAGE_MID_POINT,
-  STAGE_PADDING,
-} from "./constants/stage.js";
+import { STAGE_MID_POINT, STAGE_PADDING } from "./constants/stage.js";
 import {
   pollGamepads,
   registerGamepadEvents,
