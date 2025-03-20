@@ -80,6 +80,10 @@ export const isAxeGreater = (padId, axeId, value) =>
 export const isAxeLower = (padId, axeId, value) =>
   gamePads.get(padId)?.axes[axeId] <= value;
 
+export const isControlDown = (id, control) =>
+  isKeyDown(controls[id].keyboard[control]) ||
+  isButtonDown(id, controls[id].gamePad[control]);
+
 export const isLeft = (id) =>
   isKeyDown(controls[id].keyboard[Control.LEFT]) ||
   isButtonDown(id, controls[id].gamePad[Control.LEFT]) ||
