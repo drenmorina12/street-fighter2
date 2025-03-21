@@ -2,7 +2,10 @@ import { controls, Control, GamepadThumbstick } from "../constants/control.js";
 import { FighterDirection } from "../constants/fighter.js";
 
 const heldKeys = new Set();
+const pressedKeys = new Set();
+
 const gamePads = new Map();
+const pressedButtons = new Set();
 
 const mappedKeys = controls
   .map(({ keyboard }) => Object.values(keyboard))
@@ -18,9 +21,13 @@ function handleKeyDown(event) {
 }
 
 function handleKeyUp(event) {
+  if (!mappedKeys.includes(event.code)) {
+    return;
+  }
   event.preventDefault();
 
   heldKeys.delete(event.code);
+  pressedKeys.delete(event.code);
 }
 
 function handleGamepadConnected(event) {
@@ -38,6 +45,8 @@ function handleGamepadDisconnected(event) {
 
   gamePads.delete(index);
 }
+
+// Control event handlers
 
 export function registerKeyboardEvents() {
   window.addEventListener("keydown", handleKeyDown);
@@ -63,17 +72,47 @@ export function pollGamepads() {
       const { index, axes, buttons } = gamePad;
 
       gamePads.set(index, { axes, buttons });
+
+      for (const button in buttons) {
+        const key = `${gamePad.index}-${button}`;
+
+        if (pressedButtons.has(key) && isButtonUp(gamepad.index, button)) {
+          pressedButtons.delete(key);
+        }
+      }
     }
   }
 }
 
+// Control helpers
+
 export const isKeyDown = (code) => heldKeys.has(code);
 export const isKeyUp = (code) => !heldKeys.has(code);
+
+export function isKeyPressed(code) {
+  if (heldKeys.has(code) && !pressedKeys.has(code)) {
+    pressedKeys.add(code);
+    return true;
+  }
+
+  return false;
+}
 
 export const isButtonDown = (padId, button) =>
   gamePads.get(padId)?.buttons[button].pressed;
 export const isButtonUp = (padId, button) =>
   !gamePads.get(padId)?.buttons[button].pressed;
+
+export function isButtonPressed(padId, button) {
+  const key = `${padId}-${button}`;
+
+  if (isButtonDown(padId, button) && !pressedButtons.has(key)) {
+    pressedButtons.add(key);
+    return true;
+  }
+
+  return false;
+}
 
 export const isAxeGreater = (padId, axeId, value) =>
   gamePads.get(padId)?.axes[axeId] >= value;
@@ -83,6 +122,10 @@ export const isAxeLower = (padId, axeId, value) =>
 export const isControlDown = (id, control) =>
   isKeyDown(controls[id].keyboard[control]) ||
   isButtonDown(id, controls[id].gamePad[control]);
+
+export const isControlPressed = (id, control) =>
+  isKeyPressed(controls[id].keyboard[control]) ||
+  isButtonPressed(id, controls[id].gamePad[control]);
 
 export const isLeft = (id) =>
   isKeyDown(controls[id].keyboard[Control.LEFT]) ||
@@ -126,3 +169,5 @@ export const isBackward = (id, direction) =>
 
 export const isIdle = (id) =>
   !(isRight(id) || isLeft(id) || isUp(id) || isDown(id));
+
+export const isLightPunch = (id) => isControlPressed(id, Control.LIGHT_PUNCH);
