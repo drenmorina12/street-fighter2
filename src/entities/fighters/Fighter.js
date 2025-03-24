@@ -258,7 +258,7 @@ export class Fighter {
 
     return {
       push: { x, y, width, height },
-      hurt: { head, body, feet },
+      hurt: [head, body, feet],
     };
   }
 
@@ -603,6 +603,33 @@ export class Fighter {
     this.updateStageConstraints(time, ctx, camera);
   }
 
+  drawDebugBox(ctx, camera, dimensions, baseColor) {
+    if (!Array.isArray(dimensions)) {
+      return;
+    }
+
+    const [x = 0, y = 0, width = 0, height = 0] = dimensions;
+
+    ctx.beginPath();
+    ctx.strokeStyle = baseColor + "AA";
+    ctx.fillStyle = baseColor + "44";
+    ctx.fillRect(
+      Math.floor(this.position.x + x * this.direction - camera.position.x) +
+        0.5,
+      Math.floor(this.position.y + y - camera.position.y) + 0.5,
+      width * this.direction,
+      height
+    );
+    ctx.rect(
+      Math.floor(this.position.x + x * this.direction - camera.position.x) +
+        0.5,
+      Math.floor(this.position.y + y - camera.position.y) + 0.5,
+      width * this.direction,
+      height
+    );
+    ctx.stroke();
+  }
+
   drawDebug(ctx, camera) {
     const [frameKey] = this.animations[this.currentState][this.animationFrame];
     const boxes = this.getBoxes(frameKey);
@@ -610,26 +637,14 @@ export class Fighter {
     ctx.lineWidth = 1;
 
     // Push Box
-    ctx.beginPath();
-    ctx.strokeStyle = "#55FF55";
-    ctx.fillStyle = "#55FF5555";
-    ctx.fillRect(
-      Math.floor(
-        this.position.x + boxes.push.x * this.direction - camera.position.x
-      ) + 0.5,
-      Math.floor(this.position.y + boxes.push.y - camera.position.y) + 0.5,
-      boxes.push.width * this.direction,
-      boxes.push.height
-    );
-    ctx.rect(
-      Math.floor(
-        this.position.x + boxes.push.x * this.direction - camera.position.x
-      ) + 0.5,
-      Math.floor(this.position.y + boxes.push.y - camera.position.y) + 0.5,
-      boxes.push.width * this.direction,
-      boxes.push.height
-    );
-    ctx.stroke();
+
+    this.drawDebugBox(ctx, camera, Object.values(boxes.push), "#55FF55");
+
+    // Hurt Box
+
+    for (const hurtBox of boxes.hurt) {
+      this.drawDebugBox(ctx, camera, hurtBox, "#7777FF");
+    }
 
     // Origin
     ctx.beginPath();
