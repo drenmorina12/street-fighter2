@@ -58,6 +58,8 @@ export class Fighter {
           FighterState.JUMP_LAND,
           FighterState.IDLE_TURN,
           FighterState.LIGHT_PUNCH,
+          FighterState.MEDIUM_PUNCH,
+          FighterState.HEAVY_PUNCH,
         ],
       },
       [FighterState.WALK_FORWARDS]: {
@@ -142,6 +144,24 @@ export class Fighter {
       [FighterState.LIGHT_PUNCH]: {
         init: this.handleStandardLightAttackInit.bind(this),
         update: this.handleLightPunchState.bind(this),
+        validFrom: [
+          FighterState.IDLE,
+          FighterState.WALK_FORWARDS,
+          FighterState.WALK_BACKWARDS,
+        ],
+      },
+      [FighterState.MEDIUM_PUNCH]: {
+        init: this.handleStandardMediumAttackInit.bind(this),
+        update: this.handleMediumPunchState.bind(this),
+        validFrom: [
+          FighterState.IDLE,
+          FighterState.WALK_FORWARDS,
+          FighterState.WALK_BACKWARDS,
+        ],
+      },
+      [FighterState.HEAVY_PUNCH]: {
+        init: this.handleStandardHeavyAttackInit.bind(this),
+        update: this.handleMediumPunchState.bind(this),
         validFrom: [
           FighterState.IDLE,
           FighterState.WALK_FORWARDS,
@@ -240,7 +260,15 @@ export class Fighter {
   }
 
   handleStandardLightAttackInit() {
-    this.handleIdleInit();
+    this.resetVelocities();
+  }
+
+  handleStandardMediumAttackInit() {
+    this.resetVelocities();
+  }
+
+  handleStandardHeavyAttackInit() {
+    this.resetVelocities();
   }
 
   // Handle States
@@ -256,6 +284,10 @@ export class Fighter {
       this.changeState(FighterState.WALK_FORWARDS);
     } else if (control.isLightPunch(this.playerId)) {
       this.changeState(FighterState.LIGHT_PUNCH);
+    } else if (control.isMediumPunch(this.playerId)) {
+      this.changeState(FighterState.MEDIUM_PUNCH);
+    } else if (control.isHeavyPunch(this.playerId)) {
+      this.changeState(FighterState.HEAVY_PUNCH);
     }
 
     const newDirection = this.getDirection();
@@ -394,6 +426,13 @@ export class Fighter {
       this.animationFrame = 0;
     }
 
+    if (!this.isAnimationCompleted()) {
+      return;
+    }
+    this.changeState(FighterState.IDLE);
+  }
+
+  handleMediumPunchState() {
     if (!this.isAnimationCompleted()) {
       return;
     }

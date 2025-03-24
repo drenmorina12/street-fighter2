@@ -73,7 +73,7 @@ export class Ryu extends Fighter {
       // Medium/Heavy Punch
       ["medium-punch-1",[[[6, 466, 60, 94],[29, 92]], PushBox.IDLE]],
       ["medium-punch-2",[[[86, 465, 74, 95],[29, 92]], PushBox.IDLE]],
-      ["medium-punch-2",[[[175, 465, 108, 94],[24, 92]], PushBox.IDLE]],
+      ["medium-punch-3",[[[175, 465, 108, 94],[24, 92]], PushBox.IDLE]],
 
       // Heavy Punch
       ["heavy-punch-1",[[[175, 465, 108, 94],[24, 92]], PushBox.IDLE]],
