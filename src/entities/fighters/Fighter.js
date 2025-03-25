@@ -239,8 +239,7 @@ export class Fighter {
     );
 
   resetVelocities() {
-    this.velocity.x = 0;
-    this.velocity.y = 0;
+    this.velocity = { x: 0, y: 0 };
   }
 
   getDirection() {
@@ -281,6 +280,9 @@ export class Fighter {
       newState === this.currentState ||
       !this.states[newState].validFrom.includes(this.currentState)
     ) {
+      console.warn(
+        `Illegal transition from ${this.currentState} to ${newState}`
+      );
       return;
     }
 
