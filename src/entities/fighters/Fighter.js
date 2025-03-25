@@ -18,10 +18,10 @@ import {
   getActualBoxDimensions,
   rectsOverlap,
 } from "../../utils/collisions.js";
+import { gameState } from "../../state/gameState.js";
 
 export class Fighter {
-  constructor({ name, playerId }) {
-    this.name = name;
+  constructor({ playerId }) {
     this.playerId = playerId;
     this.position = {
       x:
@@ -667,7 +667,9 @@ export class Fighter {
       const hurtName = ["head", "body", "feet"];
 
       console.log(
-        `${this.name} has hit ${this.opponent.name}'s ${hurtName[hurtIndex]}`
+        `${gameState.fighters[this.playerId].id} has hit ${
+          gameState.fighters[this.opponent.playerId].id
+        }'s ${hurtName[hurtIndex]}`
       );
     }
   }

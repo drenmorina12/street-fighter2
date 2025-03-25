@@ -7,8 +7,8 @@ import {
 } from "../../constants/fighter.js";
 
 export class Ken extends Fighter {
-  constructor({ playerId }) {
-    super({ name: "Ken", playerId });
+  constructor(playerId) {
+    super({ playerId });
 
     this.image = document.querySelector('img[alt="ken"]');
 
