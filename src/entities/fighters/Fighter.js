@@ -5,6 +5,7 @@ import {
   FrameDelay,
   PUSH_FRICTION,
 } from "../../constants/fighter.js";
+import { FRAME_TIME } from "../../constants/game.js";
 import { FighterState } from "../../constants/fighter.js";
 import {
   STAGE_FLOOR,
@@ -618,7 +619,7 @@ export class Fighter {
     const animation = this.animations[this.currentState];
     const [, frameDelay] = animation[this.animationFrame];
 
-    if (time.previous <= this.animationTimer + frameDelay) {
+    if (time.previous <= this.animationTimer + frameDelay * FRAME_TIME) {
       return;
     }
     this.animationTimer = time.previous;
