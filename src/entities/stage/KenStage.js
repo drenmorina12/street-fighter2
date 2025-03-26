@@ -6,8 +6,12 @@ import { SkewedFloor } from "./shared/SkewedFloor.js";
 
 export class KenStage {
   constructor() {
+    // Everything below should go above the constructor
     this.image = document.querySelector('img[alt="stage"]');
+    this.music = document.querySelector("audio#theme-ken");
     this.floor = new SkewedFloor(this.image, [8, 392, 896, 56]);
+
+    this.music.play();
 
     // prettier-ignore
     this.frames = new Map([
