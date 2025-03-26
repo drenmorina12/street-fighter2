@@ -1,10 +1,13 @@
 import {
+  HEALTH_DAMAGE_COLOR,
+  HEALTH_MAX_HIT_POINTS,
   TIME_DELAY,
   TIME_FLASH_DELAY,
   TIME_FRAME_KEYS,
 } from "../../constants/battle.js";
 import { gameState } from "../../state/gameState.js";
 import { drawFrame } from "../../utils/context.js";
+import { FPS } from "../../constants/game.js";
 
 export class StatusBar {
   constructor() {
@@ -14,6 +17,17 @@ export class StatusBar {
     this.timeTimer = 0;
     this.timeFlashTimer = 0;
     this.useFlashFrames = false;
+
+    this.healthBars = [
+      {
+        timer: 0,
+        hitPoints: HEALTH_MAX_HIT_POINTS,
+      },
+      {
+        timer: 0,
+        hitPoints: HEALTH_MAX_HIT_POINTS,
+      },
+    ];
 
     // prettier-ignore
     this.frames = new Map([
@@ -110,8 +124,23 @@ export class StatusBar {
     }
   }
 
+  updateHealthBars(time) {
+    for (const index in this.healthBars) {
+      if (
+        this.healthBars[index].hitPoints <= gameState.fighters[index].hitPoints
+      ) {
+        continue;
+      }
+      this.healthBars[index].hitPoints = Math.max(
+        0,
+        this.healthBars[index].hitPoints - time.secondsPassed * FPS
+      );
+    }
+  }
+
   update(time) {
     this.updateTime(time);
+    this.updateHealthBars(time);
   }
 
   drawFrame(ctx, frameKey, x, y, direction = 1) {
@@ -122,6 +151,23 @@ export class StatusBar {
     this.drawFrame(ctx, "health-bar", 31, 20);
     this.drawFrame(ctx, "ko-white", 176, 18);
     this.drawFrame(ctx, "health-bar", 353, 20, -1);
+
+    ctx.fillStyle = HEALTH_DAMAGE_COLOR;
+
+    ctx.beginPath();
+    ctx.fillRect(
+      32,
+      21,
+      HEALTH_MAX_HIT_POINTS - Math.floor(this.healthBars[0].hitPoints),
+      9
+    );
+
+    ctx.fillRect(
+      208 + Math.floor(this.healthBars[1].hitPoints),
+      21,
+      HEALTH_MAX_HIT_POINTS - Math.floor(this.healthBars[1].hitPoints),
+      9
+    );
   }
 
   drawTime(ctx) {
@@ -155,13 +201,13 @@ export class StatusBar {
 
   drawScores(ctx) {
     this.drawScoreLabel(ctx, "P1", 4);
-    this.drawScore(ctx, 1, 45);
+    this.drawScore(ctx, gameState.fighters[0].score, 45);
 
     this.drawScoreLabel(ctx, "ANT".toUpperCase(), 133);
     this.drawScore(ctx, 50000, 177);
 
     this.drawScoreLabel(ctx, "P2", 269);
-    this.drawScore(ctx, 1, 309);
+    this.drawScore(ctx, gameState.fighters[1].score, 309);
   }
 
   draw(ctx) {
