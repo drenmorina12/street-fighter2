@@ -7,8 +7,8 @@ export const FighterDirection = {
 };
 
 export const FighterId = {
-  RYU: "Ryu",
   KEN: "Ken",
+  RYU: "Ryu",
 };
 
 export const FighterAttackType = {

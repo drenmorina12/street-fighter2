@@ -33,10 +33,10 @@ export class BattleScene {
 
   getFighterEntityClass(id) {
     switch (id) {
-      case FighterId.KEN:
-        return Ken;
       case FighterId.RYU:
         return Ryu;
+      case FighterId.KEN:
+        return Ken;
       default:
         throw new Error("Unimplemented fighter entity request!");
     }
@@ -81,9 +81,10 @@ export class BattleScene {
   }
 
   handleAttackHit(playerId, opponentId, position, strength) {
-    gameState.fighters[playerId].score += FighterAttackBaseData[strength].score;
+    gameState.fighters[opponentId].score +=
+      FighterAttackBaseData[strength].score;
 
-    gameState.fighters[opponentId].hitPoints -=
+    gameState.fighters[playerId].hitPoints -=
       FighterAttackBaseData[strength].damage;
     this.addEntity(
       this.getHitSplashClass(strength),
