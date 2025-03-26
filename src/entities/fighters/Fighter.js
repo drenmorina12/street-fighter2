@@ -5,7 +5,6 @@ import {
   FrameDelay,
   PUSH_FRICTION,
   FighterAttackStrength,
-  FighterAttackBaseData,
 } from "../../constants/fighter.js";
 import { FRAME_TIME } from "../../constants/game.js";
 import { FighterState } from "../../constants/fighter.js";
@@ -21,10 +20,208 @@ import {
   rectsOverlap,
 } from "../../utils/collisions.js";
 import { gameState } from "../../state/gameState.js";
+import { DEBUG_drawCollisionInfo } from "../../utils/fighterDebug.js";
 
 export class Fighter {
+  velocity = { x: 0, y: 0 };
+  initialVelocity = {};
+  gravity = 0;
+
+  attackStruck = false;
+
+  frames = new Map();
+  animationFrame = 0;
+  animationTimer = 0;
+  animations = {};
+
+  image = new Image();
+
+  opponent = undefined;
+
+  boxes = {
+    push: { x: 0, y: 0, width: 0, height: 0 },
+    hurt: [
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+    ],
+    hit: { x: 0, y: 0, width: 0, height: 0 },
+  };
+
+  states = {
+    [FighterState.IDLE]: {
+      init: this.handleIdleInit.bind(this),
+      update: this.handleIdleState.bind(this),
+      validFrom: [
+        undefined,
+        FighterState.IDLE,
+        FighterState.WALK_FORWARDS,
+        FighterState.WALK_BACKWARDS,
+        FighterState.JUMP_UP,
+        FighterState.JUMP_FORWARDS,
+        FighterState.JUMP_BACKWARDS,
+        FighterState.CROUCH_UP,
+        FighterState.JUMP_LAND,
+        FighterState.IDLE_TURN,
+        FighterState.LIGHT_PUNCH,
+        FighterState.MEDIUM_PUNCH,
+        FighterState.HEAVY_PUNCH,
+        FighterState.LIGHT_KICK,
+        FighterState.MEDIUM_KICK,
+        FighterState.HEAVY_KICK,
+      ],
+    },
+    [FighterState.WALK_FORWARDS]: {
+      init: this.handleMoveInit.bind(this),
+      update: this.handleWalkForwardState.bind(this),
+      validFrom: [FighterState.IDLE, FighterState.WALK_BACKWARDS],
+    },
+    [FighterState.WALK_BACKWARDS]: {
+      init: this.handleMoveInit.bind(this),
+      update: this.handleWalkBackwardsState.bind(this),
+      validFrom: [FighterState.IDLE, FighterState.WALK_FORWARDS],
+    },
+    [FighterState.JUMP_START]: {
+      init: this.handleJumpStartInit.bind(this),
+      update: this.handleJumpStartState.bind(this),
+      validFrom: [
+        FighterState.IDLE,
+        FighterState.WALK_FORWARDS,
+        FighterState.WALK_BACKWARDS,
+        FighterState.JUMP_LAND,
+        FighterState.IDLE_TURN,
+      ],
+    },
+    [FighterState.JUMP_UP]: {
+      init: this.handleJumpInit.bind(this),
+      update: this.handleJumpState.bind(this),
+      validFrom: [FighterState.JUMP_START],
+    },
+    [FighterState.JUMP_FORWARDS]: {
+      init: this.handleJumpInit.bind(this),
+      update: this.handleJumpState.bind(this),
+      validFrom: [FighterState.JUMP_START],
+    },
+    [FighterState.JUMP_BACKWARDS]: {
+      init: this.handleJumpInit.bind(this),
+      update: this.handleJumpState.bind(this),
+      validFrom: [FighterState.JUMP_START],
+    },
+    [FighterState.JUMP_LAND]: {
+      init: this.handleJumpLandInit.bind(this),
+      update: this.handleJumpLandState.bind(this),
+      validFrom: [
+        FighterState.JUMP_UP,
+        FighterState.JUMP_BACKWARDS,
+        FighterState.JUMP_FORWARDS,
+      ],
+    },
+    [FighterState.CROUCH]: {
+      init: () => {},
+      update: this.handleCrouchState.bind(this),
+      validFrom: [FighterState.CROUCH_DOWN, FighterState.CROUCH_TURN],
+    },
+    [FighterState.CROUCH_DOWN]: {
+      init: this.handleCrouchDownInit.bind(this),
+      update: this.handleCrouchDownState.bind(this),
+      validFrom: [
+        FighterState.IDLE,
+        FighterState.WALK_FORWARDS,
+        FighterState.WALK_BACKWARDS,
+      ],
+    },
+    [FighterState.CROUCH_UP]: {
+      init: () => {},
+      update: this.handleCrouchUpState.bind(this),
+      validFrom: [FighterState.CROUCH],
+    },
+    [FighterState.IDLE_TURN]: {
+      init: () => {},
+      update: this.handleIdleTurnState.bind(this),
+      validFrom: [
+        FighterState.IDLE,
+        FighterState.JUMP_LAND,
+        FighterState.WALK_BACKWARDS,
+        FighterState.WALK_FORWARDS,
+      ],
+    },
+    [FighterState.CROUCH_TURN]: {
+      init: () => {},
+      update: this.handleCrouchTurnState.bind(this),
+      validFrom: [FighterState.CROUCH],
+    },
+    [FighterState.LIGHT_PUNCH]: {
+      attackType: FighterAttackType.PUNCH,
+      attackStrength: FighterAttackStrength.LIGHT,
+      init: this.handleStandardLightAttackInit.bind(this),
+      update: this.handleLightPunchState.bind(this),
+      validFrom: [
+        FighterState.IDLE,
+        FighterState.WALK_FORWARDS,
+        FighterState.WALK_BACKWARDS,
+      ],
+    },
+    [FighterState.MEDIUM_PUNCH]: {
+      attackType: FighterAttackType.PUNCH,
+      attackStrength: FighterAttackStrength.MEDIUM,
+      init: this.handleStandardMediumAttackInit.bind(this),
+      update: this.handleMediumPunchState.bind(this),
+      validFrom: [
+        FighterState.IDLE,
+        FighterState.WALK_FORWARDS,
+        FighterState.WALK_BACKWARDS,
+      ],
+    },
+    [FighterState.HEAVY_PUNCH]: {
+      attackType: FighterAttackType.PUNCH,
+      attackStrength: FighterAttackStrength.HEAVY,
+      init: this.handleStandardHeavyAttackInit.bind(this),
+      update: this.handleMediumPunchState.bind(this),
+      validFrom: [
+        FighterState.IDLE,
+        FighterState.WALK_FORWARDS,
+        FighterState.WALK_BACKWARDS,
+      ],
+    },
+    [FighterState.LIGHT_KICK]: {
+      attackType: FighterAttackType.KICK,
+      attackStrength: FighterAttackStrength.LIGHT,
+      init: this.handleStandardLightAttackInit.bind(this),
+      update: this.handleLightKickState.bind(this),
+      validFrom: [
+        FighterState.IDLE,
+        FighterState.WALK_FORWARDS,
+        FighterState.WALK_BACKWARDS,
+      ],
+    },
+    [FighterState.MEDIUM_KICK]: {
+      attackType: FighterAttackType.KICK,
+      attackStrength: FighterAttackStrength.MEDIUM,
+      init: this.handleStandardMediumAttackInit.bind(this),
+      update: this.handleMediumKickState.bind(this),
+      validFrom: [
+        FighterState.IDLE,
+        FighterState.WALK_FORWARDS,
+        FighterState.WALK_BACKWARDS,
+      ],
+    },
+    [FighterState.HEAVY_KICK]: {
+      attackType: FighterAttackType.KICK,
+      attackStrength: FighterAttackStrength.HEAVY,
+      init: this.handleStandardHeavyAttackInit.bind(this),
+      update: this.handleMediumKickState.bind(this),
+      validFrom: [
+        FighterState.IDLE,
+        FighterState.WALK_FORWARDS,
+        FighterState.WALK_BACKWARDS,
+      ],
+    },
+  };
+
   constructor(playerId, onAttackHit) {
     this.playerId = playerId;
+    this.onAttackHit = onAttackHit;
+
     this.position = {
       x:
         STAGE_MID_POINT +
@@ -32,203 +229,9 @@ export class Fighter {
         (playerId === 1 ? -FIGHTER_START_DISTANCE : FIGHTER_START_DISTANCE),
       y: STAGE_FLOOR,
     };
-    this.velocity = { x: 0, y: 0 };
-    this.initialVelocity = {};
+
     this.direction =
       playerId === 0 ? FighterDirection.RIGHT : FighterDirection.LEFT;
-    this.gravity = 0;
-
-    this.attackStruck = false;
-
-    this.frames = new Map();
-    this.animationFrame = 0;
-    this.animationTimer = 0;
-    this.animations = {};
-
-    this.image = new Image();
-
-    this.opponent;
-    this.onAttackHit = onAttackHit;
-
-    this.boxes = {
-      push: { x: 0, y: 0, width: 0, height: 0 },
-      hurt: [
-        [0, 0, 0, 0],
-        [0, 0, 0, 0],
-        [0, 0, 0, 0],
-      ],
-      hit: { x: 0, y: 0, width: 0, height: 0 },
-    };
-
-    this.states = {
-      [FighterState.IDLE]: {
-        init: this.handleIdleInit.bind(this),
-        update: this.handleIdleState.bind(this),
-        validFrom: [
-          undefined,
-          FighterState.IDLE,
-          FighterState.WALK_FORWARDS,
-          FighterState.WALK_BACKWARDS,
-          FighterState.JUMP_UP,
-          FighterState.JUMP_FORWARDS,
-          FighterState.JUMP_BACKWARDS,
-          FighterState.CROUCH_UP,
-          FighterState.JUMP_LAND,
-          FighterState.IDLE_TURN,
-          FighterState.LIGHT_PUNCH,
-          FighterState.MEDIUM_PUNCH,
-          FighterState.HEAVY_PUNCH,
-          FighterState.LIGHT_KICK,
-          FighterState.MEDIUM_KICK,
-          FighterState.HEAVY_KICK,
-        ],
-      },
-      [FighterState.WALK_FORWARDS]: {
-        init: this.handleMoveInit.bind(this),
-        update: this.handleWalkForwardState.bind(this),
-        validFrom: [FighterState.IDLE, FighterState.WALK_BACKWARDS],
-      },
-      [FighterState.WALK_BACKWARDS]: {
-        init: this.handleMoveInit.bind(this),
-        update: this.handleWalkBackwardsState.bind(this),
-        validFrom: [FighterState.IDLE, FighterState.WALK_FORWARDS],
-      },
-      [FighterState.JUMP_START]: {
-        init: this.handleJumpStartInit.bind(this),
-        update: this.handleJumpStartState.bind(this),
-        validFrom: [
-          FighterState.IDLE,
-          FighterState.WALK_FORWARDS,
-          FighterState.WALK_BACKWARDS,
-          FighterState.JUMP_LAND,
-          FighterState.IDLE_TURN,
-        ],
-      },
-      [FighterState.JUMP_UP]: {
-        init: this.handleJumpInit.bind(this),
-        update: this.handleJumpState.bind(this),
-        validFrom: [FighterState.JUMP_START],
-      },
-      [FighterState.JUMP_FORWARDS]: {
-        init: this.handleJumpInit.bind(this),
-        update: this.handleJumpState.bind(this),
-        validFrom: [FighterState.JUMP_START],
-      },
-      [FighterState.JUMP_BACKWARDS]: {
-        init: this.handleJumpInit.bind(this),
-        update: this.handleJumpState.bind(this),
-        validFrom: [FighterState.JUMP_START],
-      },
-      [FighterState.JUMP_LAND]: {
-        init: this.handleJumpLandInit.bind(this),
-        update: this.handleJumpLandState.bind(this),
-        validFrom: [
-          FighterState.JUMP_UP,
-          FighterState.JUMP_BACKWARDS,
-          FighterState.JUMP_FORWARDS,
-        ],
-      },
-      [FighterState.CROUCH]: {
-        init: () => {},
-        update: this.handleCrouchState.bind(this),
-        validFrom: [FighterState.CROUCH_DOWN, FighterState.CROUCH_TURN],
-      },
-      [FighterState.CROUCH_DOWN]: {
-        init: this.handleCrouchDownInit.bind(this),
-        update: this.handleCrouchDownState.bind(this),
-        validFrom: [
-          FighterState.IDLE,
-          FighterState.WALK_FORWARDS,
-          FighterState.WALK_BACKWARDS,
-        ],
-      },
-      [FighterState.CROUCH_UP]: {
-        init: () => {},
-        update: this.handleCrouchUpState.bind(this),
-        validFrom: [FighterState.CROUCH],
-      },
-      [FighterState.IDLE_TURN]: {
-        init: () => {},
-        update: this.handleIdleTurnState.bind(this),
-        validFrom: [
-          FighterState.IDLE,
-          FighterState.JUMP_LAND,
-          FighterState.WALK_BACKWARDS,
-          FighterState.WALK_FORWARDS,
-        ],
-      },
-      [FighterState.CROUCH_TURN]: {
-        init: () => {},
-        update: this.handleCrouchTurnState.bind(this),
-        validFrom: [FighterState.CROUCH],
-      },
-      [FighterState.LIGHT_PUNCH]: {
-        attackType: FighterAttackType.PUNCH,
-        attackStrength: FighterAttackStrength.LIGHT,
-        init: this.handleStandardLightAttackInit.bind(this),
-        update: this.handleLightPunchState.bind(this),
-        validFrom: [
-          FighterState.IDLE,
-          FighterState.WALK_FORWARDS,
-          FighterState.WALK_BACKWARDS,
-        ],
-      },
-      [FighterState.MEDIUM_PUNCH]: {
-        attackType: FighterAttackType.PUNCH,
-        attackStrength: FighterAttackStrength.MEDIUM,
-        init: this.handleStandardMediumAttackInit.bind(this),
-        update: this.handleMediumPunchState.bind(this),
-        validFrom: [
-          FighterState.IDLE,
-          FighterState.WALK_FORWARDS,
-          FighterState.WALK_BACKWARDS,
-        ],
-      },
-      [FighterState.HEAVY_PUNCH]: {
-        attackType: FighterAttackType.PUNCH,
-        attackStrength: FighterAttackStrength.HEAVY,
-        init: this.handleStandardHeavyAttackInit.bind(this),
-        update: this.handleMediumPunchState.bind(this),
-        validFrom: [
-          FighterState.IDLE,
-          FighterState.WALK_FORWARDS,
-          FighterState.WALK_BACKWARDS,
-        ],
-      },
-      [FighterState.LIGHT_KICK]: {
-        attackType: FighterAttackType.KICK,
-        attackStrength: FighterAttackStrength.LIGHT,
-        init: this.handleStandardLightAttackInit.bind(this),
-        update: this.handleLightKickState.bind(this),
-        validFrom: [
-          FighterState.IDLE,
-          FighterState.WALK_FORWARDS,
-          FighterState.WALK_BACKWARDS,
-        ],
-      },
-      [FighterState.MEDIUM_KICK]: {
-        attackType: FighterAttackType.KICK,
-        attackStrength: FighterAttackStrength.MEDIUM,
-        init: this.handleStandardMediumAttackInit.bind(this),
-        update: this.handleMediumKickState.bind(this),
-        validFrom: [
-          FighterState.IDLE,
-          FighterState.WALK_FORWARDS,
-          FighterState.WALK_BACKWARDS,
-        ],
-      },
-      [FighterState.HEAVY_KICK]: {
-        attackType: FighterAttackType.KICK,
-        attackStrength: FighterAttackStrength.HEAVY,
-        init: this.handleStandardHeavyAttackInit.bind(this),
-        update: this.handleMediumKickState.bind(this),
-        validFrom: [
-          FighterState.IDLE,
-          FighterState.WALK_FORWARDS,
-          FighterState.WALK_BACKWARDS,
-        ],
-      },
-    };
 
     this.changeState(FighterState.IDLE);
   }
@@ -724,75 +727,6 @@ export class Fighter {
     this.updateAttackBoxCollided(time);
   }
 
-  drawDebugBox(ctx, camera, dimensions, baseColor) {
-    if (!Array.isArray(dimensions)) {
-      return;
-    }
-
-    const [x = 0, y = 0, width = 0, height = 0] = dimensions;
-
-    ctx.beginPath();
-    ctx.strokeStyle = baseColor + "AA";
-    ctx.fillStyle = baseColor + "44";
-    ctx.fillRect(
-      Math.floor(this.position.x + x * this.direction - camera.position.x) +
-        0.5,
-      Math.floor(this.position.y + y - camera.position.y) + 0.5,
-      width * this.direction,
-      height
-    );
-    ctx.rect(
-      Math.floor(this.position.x + x * this.direction - camera.position.x) +
-        0.5,
-      Math.floor(this.position.y + y - camera.position.y) + 0.5,
-      width * this.direction,
-      height
-    );
-    ctx.stroke();
-  }
-
-  drawDebug(ctx, camera) {
-    const [frameKey] = this.animations[this.currentState][this.animationFrame];
-    const boxes = this.getBoxes(frameKey);
-
-    ctx.lineWidth = 1;
-
-    // Push Box
-
-    this.drawDebugBox(ctx, camera, Object.values(boxes.push), "#55FF55");
-
-    // Hurt Box
-
-    for (const hurtBox of boxes.hurt) {
-      this.drawDebugBox(ctx, camera, hurtBox, "#7777FF");
-    }
-
-    // Hit Box
-
-    this.drawDebugBox(ctx, camera, Object.values(boxes.hit), "#FF0000");
-
-    // Origin
-    ctx.beginPath();
-    ctx.strokeStyle = "white";
-    ctx.moveTo(
-      Math.floor(this.position.x - camera.position.x) - 4,
-      Math.floor(this.position.y - camera.position.y) - 0.5
-    );
-    ctx.lineTo(
-      Math.floor(this.position.x - camera.position.x) + 5,
-      Math.floor(this.position.y - camera.position.y) - 0.5
-    );
-    ctx.moveTo(
-      Math.floor(this.position.x - camera.position.x) + 0.5,
-      Math.floor(this.position.y - camera.position.y) - 5
-    );
-    ctx.lineTo(
-      Math.floor(this.position.x - camera.position.x) + 0.5,
-      Math.floor(this.position.y - camera.position.y) + 4
-    );
-    ctx.stroke();
-  }
-
   draw(ctx, camera) {
     const [frameKey] = this.animations[this.currentState][this.animationFrame];
     const [[[x, y, width, height], [originX, originY]]] =
@@ -813,6 +747,6 @@ export class Fighter {
     );
     ctx.setTransform(1, 0, 0, 1, 0, 0);
 
-    this.drawDebug(ctx, camera);
+    DEBUG_drawCollisionInfo(this, ctx, camera);
   }
 }
