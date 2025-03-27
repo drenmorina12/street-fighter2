@@ -77,7 +77,7 @@ export function pollGamepads() {
       for (const button in buttons) {
         const key = `${gamePad.index}-${button}`;
 
-        if (pressedButtons.has(key) && isButtonUp(gamepad.index, button)) {
+        if (pressedButtons.has(key) && isButtonUp(gamePad.index, button)) {
           pressedButtons.delete(key);
         }
       }
