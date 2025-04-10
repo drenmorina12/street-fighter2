@@ -1,5 +1,6 @@
 export const PUSH_FRICTION = 66;
 export const FIGHTER_START_DISTANCE = 88;
+export const FIGHTER_HURT_DELAY = 7 + 8;
 
 export const FighterDirection = {
   LEFT: -1,
