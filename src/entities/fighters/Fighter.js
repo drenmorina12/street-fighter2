@@ -217,6 +217,36 @@ export class Fighter {
         FighterState.WALK_BACKWARDS,
       ],
     },
+    [FighterState.HURT_HEAD_LIGHT]: {
+      init: this.handleHurtInit.bind(this),
+      update: this.handleHurtState.bind(this),
+      validFrom: [],
+    },
+    [FighterState.HURT_HEAD_MEDIUM]: {
+      init: this.handleHurtInit.bind(this),
+      update: this.handleHurtState.bind(this),
+      validFrom: [],
+    },
+    [FighterState.HURT_HEAD_HEAVY]: {
+      init: this.handleHurtInit.bind(this),
+      update: this.handleHurtState.bind(this),
+      validFrom: [],
+    },
+    [FighterState.HURT_BODY_LIGHT]: {
+      init: this.handleHurtInit.bind(this),
+      update: this.handleHurtState.bind(this),
+      validFrom: [],
+    },
+    [FighterState.HURT_BODY_MEDIUM]: {
+      init: this.handleHurtInit.bind(this),
+      update: this.handleHurtState.bind(this),
+      validFrom: [],
+    },
+    [FighterState.HURT_BODY_HEAVY]: {
+      init: this.handleHurtInit.bind(this),
+      update: this.handleHurtState.bind(this),
+      validFrom: [],
+    },
   };
 
   // prettier-ignore
@@ -364,6 +394,10 @@ export class Fighter {
   handleAttackInit() {
     this.resetVelocities();
     playSound(this.soundAttacks[this.states[this.currentState].attackStrength]);
+  }
+
+  handleHurtInit() {
+    this.resetVelocities();
   }
 
   // Handle States
@@ -591,6 +625,13 @@ export class Fighter {
   }
 
   handleMediumKickState() {
+    if (!this.isAnimationCompleted()) {
+      return;
+    }
+    this.changeState(FighterState.IDLE);
+  }
+
+  handleHurtState() {
     if (!this.isAnimationCompleted()) {
       return;
     }

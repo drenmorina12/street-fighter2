@@ -57,6 +57,12 @@ export const FighterState = {
   LIGHT_KICK: "lightKick",
   MEDIUM_KICK: "mediumKick",
   HEAVY_KICK: "heavyKick",
+  HURT_HEAD_LIGHT: "hurtHeadLight",
+  HURT_HEAD_MEDIUM: "hurtHeadMedium",
+  HURT_HEAD_HEAVY: "hurtHeadHeavy",
+  HURT_BODY_LIGHT: "hurtBodyLight",
+  HURT_BODY_MEDIUM: "hurtBodyMedium",
+  HURT_BODY_HEAVY: "hurtBodyHeavy",
 };
 
 export const FrameDelay = {
