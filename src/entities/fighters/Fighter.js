@@ -547,13 +547,19 @@ export class Fighter {
     this.changeState(FighterState.CROUCH);
   }
 
+  handleLightAttackReset() {
+    this.animationFrame = 0;
+    this.handleAttackInit();
+    this.attackStruck = false;
+  }
+
   handleLightPunchState() {
     if (this.animationFrame < 2) {
       return;
     }
 
     if (control.isLightPunch(this.playerId)) {
-      this.animationFrame = 0;
+      this.handleLightAttackReset();
     }
 
     if (!this.isAnimationCompleted()) {
@@ -575,7 +581,7 @@ export class Fighter {
     }
 
     if (control.isLightKick(this.playerId)) {
-      this.animationFrame = 0;
+      this.handleLightAttackReset();
     }
 
     if (!this.isAnimationCompleted()) {
