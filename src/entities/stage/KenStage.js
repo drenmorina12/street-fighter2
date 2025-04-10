@@ -1,5 +1,6 @@
 import { FRAME_TIME } from "../../constants/game.js";
 import { STAGE_MID_POINT, STAGE_PADDING } from "../../constants/stage.js";
+import { playSound } from "../../engine/soundHandler.js";
 import { drawFrame } from "../../utils/context.js";
 import { BackgroundAnimation } from "./shared/BackgroundAnimation.js";
 import { SkewedFloor } from "./shared/SkewedFloor.js";
@@ -11,8 +12,7 @@ export class KenStage {
     this.music = document.querySelector("audio#theme-ken");
     this.floor = new SkewedFloor(this.image, [8, 392, 896, 56]);
 
-    this.music.volume = 0.3;
-    // this.music.play();
+    playSound(this.music, 0.2);
 
     // prettier-ignore
     this.frames = new Map([

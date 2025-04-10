@@ -21,6 +21,7 @@ import {
 } from "../../utils/collisions.js";
 import { gameState } from "../../state/gameState.js";
 import { DEBUG_drawCollisionInfo } from "../../utils/fighterDebug.js";
+import { playSound, stopSound } from "../../engine/soundHandler.js";
 
 export class Fighter {
   velocity = { x: 0, y: 0 };
@@ -357,12 +358,12 @@ export class Fighter {
 
   handleJumpLandInit() {
     this.resetVelocities();
-    this.soundLand.play();
+    playSound(this.soundLand);
   }
 
   handleAttackInit() {
     this.resetVelocities();
-    this.soundAttacks[this.states[this.currentState].attackStrength].play();
+    playSound(this.soundAttacks[this.states[this.currentState].attackStrength]);
   }
 
   // Handle States
@@ -698,8 +699,8 @@ export class Fighter {
         return;
       }
 
-      this.soundAttacks[attackStrength].pause();
-      this.soundHits[attackStrength][attackType].play();
+      stopSound(this.soundAttacks[attackStrength]);
+      playSound(this.soundHits[attackStrength][attackType], 0.8);
 
       const hurtIndex = this.opponent.boxes.hurt.indexOf(hurt);
       const hurtName = ["head", "body", "feet"];
