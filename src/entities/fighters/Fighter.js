@@ -153,7 +153,7 @@ export class Fighter {
     [FighterState.LIGHT_PUNCH]: {
       attackType: FighterAttackType.PUNCH,
       attackStrength: FighterAttackStrength.LIGHT,
-      init: this.handleStandardLightAttackInit.bind(this),
+      init: this.handleAttackInit.bind(this),
       update: this.handleLightPunchState.bind(this),
       validFrom: [
         FighterState.IDLE,
@@ -164,7 +164,7 @@ export class Fighter {
     [FighterState.MEDIUM_PUNCH]: {
       attackType: FighterAttackType.PUNCH,
       attackStrength: FighterAttackStrength.MEDIUM,
-      init: this.handleStandardMediumAttackInit.bind(this),
+      init: this.handleAttackInit.bind(this),
       update: this.handleMediumPunchState.bind(this),
       validFrom: [
         FighterState.IDLE,
@@ -175,7 +175,7 @@ export class Fighter {
     [FighterState.HEAVY_PUNCH]: {
       attackType: FighterAttackType.PUNCH,
       attackStrength: FighterAttackStrength.HEAVY,
-      init: this.handleStandardHeavyAttackInit.bind(this),
+      init: this.handleAttackInit.bind(this),
       update: this.handleMediumPunchState.bind(this),
       validFrom: [
         FighterState.IDLE,
@@ -186,7 +186,7 @@ export class Fighter {
     [FighterState.LIGHT_KICK]: {
       attackType: FighterAttackType.KICK,
       attackStrength: FighterAttackStrength.LIGHT,
-      init: this.handleStandardLightAttackInit.bind(this),
+      init: this.handleAttackInit.bind(this),
       update: this.handleLightKickState.bind(this),
       validFrom: [
         FighterState.IDLE,
@@ -197,7 +197,7 @@ export class Fighter {
     [FighterState.MEDIUM_KICK]: {
       attackType: FighterAttackType.KICK,
       attackStrength: FighterAttackStrength.MEDIUM,
-      init: this.handleStandardMediumAttackInit.bind(this),
+      init: this.handleAttackInit.bind(this),
       update: this.handleMediumKickState.bind(this),
       validFrom: [
         FighterState.IDLE,
@@ -208,7 +208,7 @@ export class Fighter {
     [FighterState.HEAVY_KICK]: {
       attackType: FighterAttackType.KICK,
       attackStrength: FighterAttackStrength.HEAVY,
-      init: this.handleStandardHeavyAttackInit.bind(this),
+      init: this.handleAttackInit.bind(this),
       update: this.handleMediumKickState.bind(this),
       validFrom: [
         FighterState.IDLE,
@@ -357,18 +357,12 @@ export class Fighter {
 
   handleJumpLandInit() {
     this.resetVelocities();
+    this.soundLand.play();
   }
 
-  handleStandardLightAttackInit() {
+  handleAttackInit() {
     this.resetVelocities();
-  }
-
-  handleStandardMediumAttackInit() {
-    this.resetVelocities();
-  }
-
-  handleStandardHeavyAttackInit() {
-    this.resetVelocities();
+    this.soundAttacks[this.states[this.currentState].attackStrength].play();
   }
 
   // Handle States
@@ -680,7 +674,9 @@ export class Fighter {
   }
 
   updateAttackBoxCollided() {
-    if (!this.states[this.currentState].attackType || this.attackStruck) {
+    const { attackStrength, attackType } = this.states[this.currentState];
+
+    if (!attackType || this.attackStruck) {
       return;
     }
 
@@ -701,6 +697,9 @@ export class Fighter {
       if (!boxOverlap(actualHitBox, actualOpponentHurtBox)) {
         return;
       }
+
+      this.soundAttacks[attackStrength].pause();
+      this.soundHits[attackStrength][attackType].play();
 
       const hurtIndex = this.opponent.boxes.hurt.indexOf(hurt);
       const hurtName = ["head", "body", "feet"];

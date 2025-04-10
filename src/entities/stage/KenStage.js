@@ -11,7 +11,8 @@ export class KenStage {
     this.music = document.querySelector("audio#theme-ken");
     this.floor = new SkewedFloor(this.image, [8, 392, 896, 56]);
 
-    this.music.play();
+    this.music.volume = 0.3;
+    // this.music.play();
 
     // prettier-ignore
     this.frames = new Map([
