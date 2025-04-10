@@ -218,6 +218,31 @@ export class Fighter {
     },
   };
 
+  // prettier-ignore
+  soundAttacks = {
+    [FighterAttackStrength.LIGHT]: document.querySelector("audio#sound-fighter-light-attack"),
+    [FighterAttackStrength.MEDIUM]: document.querySelector("audio#sound-fighter-medium-attack"),
+    [FighterAttackStrength.HEAVY]: document.querySelector("audio#sound-fighter-heavy-attack"),
+  }
+
+  // prettier-ignore
+  soundHits = {
+    [FighterAttackStrength.LIGHT]: {
+      [FighterAttackType.PUNCH]: document.querySelector("audio#sound-fighter-light-punch-hit"),
+      [FighterAttackType.KICK]: document.querySelector("audio#sound-fighter-light-kick-hit"),
+    },
+    [FighterAttackStrength.MEDIUM]: {
+      [FighterAttackType.PUNCH]: document.querySelector("audio#sound-fighter-medium-punch-hit"),
+      [FighterAttackType.KICK]: document.querySelector("audio#sound-fighter-medium-kick-hit"),
+    },
+    [FighterAttackStrength.HEAVY]: {
+      [FighterAttackType.PUNCH]: document.querySelector("audio#sound-fighter-heavy-punch-hit"),
+      [FighterAttackType.KICK]: document.querySelector("audio#sound-fighter-heavy-kick-hit"),
+    },
+  }
+
+  soundLand = document.querySelector("audio#sound-fighter-land");
+
   constructor(playerId, onAttackHit) {
     this.playerId = playerId;
     this.onAttackHit = onAttackHit;
