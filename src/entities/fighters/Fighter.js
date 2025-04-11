@@ -383,10 +383,7 @@ export class Fighter {
   }
 
   changeState(newState) {
-    if (
-      newState === this.currentState ||
-      !this.states[newState].validFrom.includes(this.currentState)
-    ) {
+    if (!this.states[newState].validFrom.includes(this.currentState)) {
       console.warn(
         `Illegal transition from ${this.currentState} to ${newState}`
       );
