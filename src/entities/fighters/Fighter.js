@@ -8,6 +8,7 @@ import {
   FighterHurtBox,
   hurtStateValidFrom,
   FIGHTER_HURT_DELAY,
+  FighterAttackBaseData,
 } from "../../constants/fighter.js";
 import { FRAME_TIME } from "../../constants/game.js";
 import { FighterState } from "../../constants/fighter.js";
@@ -47,6 +48,8 @@ export class Fighter {
 
   hurtShake = 0;
   hurtShakeTimer = 0;
+  slideVelocity = 0;
+  slideFriction = 0;
 
   boxes = {
     push: { x: 0, y: 0, width: 0, height: 0 },
@@ -325,6 +328,15 @@ export class Fighter {
 
   resetVelocities() {
     this.velocity = { x: 0, y: 0 };
+  }
+
+  resetSlide(transferToOpponent = false) {
+    if (transferToOpponent) {
+      this.opponent.slideVelocity = this.slideVelocity;
+      this.opponent.slideFriction = this.slideFriction;
+    }
+    this.slideFriction = 0;
+    this.slideVelocity = 0;
   }
 
   getDirection() {
@@ -683,6 +695,10 @@ export class Fighter {
 
   handleAttackHit(attackStrength, hitLocation) {
     const newState = this.getHitState(attackStrength, hitLocation);
+    const { velocity, friction } = FighterAttackBaseData[attackStrength].slide;
+
+    this.slideVelocity = velocity;
+    this.slideFriction = friction;
     this.changeState(newState);
 
     // DEBUG_logHit(this, attackStrength, hitLocation);
@@ -702,10 +718,12 @@ export class Fighter {
     ) {
       this.position.x =
         camera.position.x + ctx.canvas.width - this.boxes.push.width;
+      this.resetSlide(true);
     }
 
     if (this.position.x < camera.position.x + this.boxes.push.width) {
       this.position.x = camera.position.x + this.boxes.push.width;
+      this.resetSlide(true);
     }
 
     if (this.hasCollidedWithOpponent()) {
@@ -852,11 +870,32 @@ export class Fighter {
     this.hurtShakeTimer = time.previous + FRAME_TIME;
   }
 
-  update(time, ctx, camera) {
-    this.position.x += this.velocity.x * this.direction * time.secondsPassed;
-    this.position.y += this.velocity.y * time.secondsPassed;
+  updateSlide(time) {
+    if (this.slideVelocity >= 0) {
+      return;
+    }
 
+    this.slideVelocity += this.slideFriction * time.secondsPassed;
+
+    if (this.slideVelocity < 0) {
+      return;
+    }
+
+    this.resetSlide();
+  }
+
+  updatePosition(time) {
+    this.position.x +=
+      (this.velocity.x + this.slideVelocity) *
+      this.direction *
+      time.secondsPassed;
+    this.position.y += this.velocity.y * time.secondsPassed;
+  }
+
+  update(time, ctx, camera) {
     this.states[this.currentState].update(time, ctx);
+    this.updateSlide(time);
+    this.updatePosition(time);
     this.updateAnimation(time);
     this.updateStageConstraints(time, ctx, camera);
     this.updateAttackBoxCollided(time);
