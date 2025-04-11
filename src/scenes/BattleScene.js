@@ -9,6 +9,7 @@ import {
   FighterAttackStrength,
   FighterId,
   FighterAttackBaseData,
+  FIGHTER_HURT_DELAY,
 } from "../constants/fighter.js";
 import {
   LightHitSplash,
@@ -16,12 +17,14 @@ import {
   HeavyHitSplash,
   Shadow,
 } from "../entities/fighters/shared/index.js";
+import { FRAME_TIME } from "../constants/game.js";
 
 export class BattleScene {
   fighters = [];
   camera = undefined;
   shadows = [];
   entities = [];
+  hurtTimer = undefined;
   fighterDrawOrder = [0, 1];
 
   constructor() {
@@ -81,13 +84,14 @@ export class BattleScene {
     this.entities = this.entities.filter((thisEntity) => thisEntity !== entity);
   }
 
-  handleAttackHit(playerId, opponentId, position, strength) {
+  handleAttackHit(time, playerId, opponentId, position, strength) {
     gameState.fighters[opponentId].score +=
       FighterAttackBaseData[strength].score;
 
     gameState.fighters[playerId].hitPoints -=
       FighterAttackBaseData[strength].damage;
 
+    this.hurtTimer = time.previous + FIGHTER_HURT_DELAY * FRAME_TIME;
     this.fighterDrawOrder = [opponentId, playerId]; // The attacker will be after before the opponent
 
     this.addEntity(
@@ -112,6 +116,10 @@ export class BattleScene {
 
   updateFighters(time, ctx) {
     for (const fighter of this.fighters) {
+      if (time.previous < this.hurtTimer) {
+        return;
+      }
+
       fighter.update(time, ctx, this.camera);
     }
   }
