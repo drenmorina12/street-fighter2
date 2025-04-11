@@ -363,21 +363,21 @@ export class Fighter {
   getHitState(attackStrength, hitLocation) {
     switch (attackStrength) {
       case FighterAttackStrength.LIGHT:
-        // if (hitLocation === FighterHurtBox.HEAD) {
-        //   return FighterState.HURT_HEAD_LIGHT;
-        // }
+        if (hitLocation === FighterHurtBox.HEAD) {
+          return FighterState.HURT_HEAD_LIGHT;
+        }
         return FighterState.HURT_BODY_LIGHT;
 
       case FighterAttackStrength.MEDIUM:
-        // if (hitLocation === FighterHurtBox.HEAD) {
-        //   return FighterState.HURT_HEAD_MEDIUM;
-        // }
+        if (hitLocation === FighterHurtBox.HEAD) {
+          return FighterState.HURT_HEAD_MEDIUM;
+        }
         return FighterState.HURT_BODY_MEDIUM;
 
       case FighterAttackStrength.HEAVY:
-        // if (hitLocation === FighterHurtBox.HEAD) {
-        //   return FighterState.HURT_HEAD_HEAVY;
-        // }
+        if (hitLocation === FighterHurtBox.HEAD) {
+          return FighterState.HURT_HEAD_HEAVY;
+        }
         return FighterState.HURT_BODY_HEAVY;
     }
   }
