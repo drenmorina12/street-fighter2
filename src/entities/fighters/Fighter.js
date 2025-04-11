@@ -7,6 +7,7 @@ import {
   FighterAttackStrength,
   FighterHurtBox,
   hurtStateValidFrom,
+  FIGHTER_HURT_DELAY,
 } from "../../constants/fighter.js";
 import { FRAME_TIME } from "../../constants/game.js";
 import { FighterState } from "../../constants/fighter.js";
@@ -29,20 +30,23 @@ import {
 import { playSound, stopSound } from "../../engine/soundHandler.js";
 
 export class Fighter {
-  velocity = { x: 0, y: 0 };
-  initialVelocity = {};
-  gravity = 0;
-
-  attackStruck = false;
-
   frames = new Map();
-  animationFrame = 0;
-  animationTimer = 0;
-  animations = {};
-
   image = new Image();
 
+  animations = {};
+  animationFrame = 0;
+  animationTimer = 0;
+
+  currentState = undefined;
   opponent = undefined;
+
+  gravity = 0;
+  velocity = { x: 0, y: 0 };
+  initialVelocity = {};
+  attackStruck = false;
+
+  hurtShake = 0;
+  hurtShakeTimer = 0;
 
   boxes = {
     push: { x: 0, y: 0, width: 0, height: 0 },
@@ -432,6 +436,8 @@ export class Fighter {
 
   handleHurtInit() {
     this.resetVelocities();
+    this.hurtShake = 2;
+    this.hurtShakeTimer = performance.now();
   }
 
   // Handle States
@@ -669,6 +675,9 @@ export class Fighter {
     if (!this.isAnimationCompleted()) {
       return;
     }
+    this.hurtShake = 0;
+    this.hurtShakeTimer = 0;
+
     this.changeState(FighterState.IDLE);
   }
 
@@ -831,6 +840,18 @@ export class Fighter {
     }
   }
 
+  updateHurtShake(time, delay) {
+    if (this.hurtShakeTimer === 0 || time.previous <= this.hurtShakeTimer) {
+      return;
+    }
+
+    const shakeAmount =
+      delay - time.previous < (FIGHTER_HURT_DELAY * FRAME_TIME) / 2 ? 1 : 2;
+
+    this.hurtShake = shakeAmount - this.hurtShake;
+    this.hurtShakeTimer = time.previous + FRAME_TIME;
+  }
+
   update(time, ctx, camera) {
     this.position.x += this.velocity.x * this.direction * time.secondsPassed;
     this.position.y += this.velocity.y * time.secondsPassed;
@@ -853,8 +874,9 @@ export class Fighter {
       y,
       width,
       height,
-      Math.floor((this.position.x - camera.position.x) * this.direction) -
-        originX,
+      Math.floor(
+        (this.position.x - this.hurtShake - camera.position.x) * this.direction
+      ) - originX,
       Math.floor(this.position.y - camera.position.y) - originY,
       width,
       height

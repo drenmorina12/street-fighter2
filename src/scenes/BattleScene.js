@@ -117,10 +117,10 @@ export class BattleScene {
   updateFighters(time, ctx) {
     for (const fighter of this.fighters) {
       if (time.previous < this.hurtTimer) {
-        return;
+        fighter.updateHurtShake(time, this.hurtTimer);
+      } else {
+        fighter.update(time, ctx, this.camera);
       }
-
-      fighter.update(time, ctx, this.camera);
     }
   }
 
