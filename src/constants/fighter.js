@@ -23,6 +23,12 @@ export const FighterAttackStrength = {
   HEAVY: "heavy",
 };
 
+export const FighterHurtBox = {
+  HEAD: "head",
+  BODY: "body",
+  FEET: "feet",
+};
+
 export const FighterAttackBaseData = {
   [FighterAttackStrength.LIGHT]: {
     score: 100,
@@ -58,12 +64,12 @@ export const FighterState = {
   LIGHT_KICK: "lightKick",
   MEDIUM_KICK: "mediumKick",
   HEAVY_KICK: "heavyKick",
-  HURT_HEAD_LIGHT: "hurtHeadLight",
-  HURT_HEAD_MEDIUM: "hurtHeadMedium",
-  HURT_HEAD_HEAVY: "hurtHeadHeavy",
-  HURT_BODY_LIGHT: "hurtBodyLight",
-  HURT_BODY_MEDIUM: "hurtBodyMedium",
-  HURT_BODY_HEAVY: "hurtBodyHeavy",
+  HURT_HEAD_LIGHT: "hurt-head-light",
+  HURT_HEAD_MEDIUM: "hurt-head-medium",
+  HURT_HEAD_HEAVY: "hurt-head-heavy",
+  HURT_BODY_LIGHT: "hurt-body-light",
+  HURT_BODY_MEDIUM: "hurt-body-medium",
+  HURT_BODY_HEAVY: "hurt-body-heavy",
 };
 
 export const FrameDelay = {
@@ -115,3 +121,24 @@ export const HurtBox = {
     [-7, -33, 40, 33],
   ],
 };
+
+export const hurtStateValidFrom = [
+  FighterState.IDLE,
+  FighterState.WALK_BACKWARDS,
+  FighterState.WALK_FORWARDS,
+  FighterState.JUMP_LAND,
+  FighterState.JUMP_START,
+  FighterState.IDLE_TURN,
+  FighterState.LIGHT_PUNCH,
+  FighterState.MEDIUM_PUNCH,
+  FighterState.HEAVY_PUNCH,
+  FighterState.LIGHT_KICK,
+  FighterState.MEDIUM_KICK,
+  FighterState.HEAVY_KICK,
+  FighterState.HURT_HEAD_LIGHT,
+  FighterState.HURT_HEAD_MEDIUM,
+  FighterState.HURT_HEAD_HEAVY,
+  FighterState.HURT_BODY_LIGHT,
+  FighterState.HURT_BODY_MEDIUM,
+  FighterState.HURT_BODY_HEAVY,
+];

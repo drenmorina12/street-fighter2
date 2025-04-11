@@ -61,7 +61,7 @@ export function DEBUG_drawCollisionInfo(fighter, ctx, camera) {
   );
 
   // Hurt Box
-  for (const hurtBox of boxes.hurt) {
+  for (const hurtBox of Object.values(boxes.hurt)) {
     drawBox(ctx, camera, position, direction, hurtBox, "#7777FF");
   }
 
@@ -77,4 +77,12 @@ export function DEBUG_drawCollisionInfo(fighter, ctx, camera) {
 
   // Origin
   drawCross(ctx, camera, position, "#FFFFFF");
+}
+
+export function DEBUG_logHit(fighter, hitStrength, hitLocation) {
+  //   console.log(
+  //     `${gameState.fighters[fighter.playerId].id} has hit ${
+  //       gameState.fighters[fighter.opponent.playerId].id
+  //     }'s ${hitLocation} with a ${hitStrength} attack!`
+  //   );
 }
