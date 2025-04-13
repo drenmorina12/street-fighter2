@@ -9,6 +9,7 @@ import {
   hurtStateValidFrom,
   FIGHTER_HURT_DELAY,
   FighterAttackBaseData,
+  FIGHTER_DEFAULT_WIDTH,
 } from "../../constants/fighter.js";
 import { FRAME_TIME } from "../../constants/game.js";
 import { FighterState } from "../../constants/fighter.js";
@@ -705,15 +706,15 @@ export class Fighter {
   updateStageConstraints(time, ctx, camera) {
     if (
       this.position.x >
-      camera.position.x + ctx.canvas.width - this.boxes.push.width
+      camera.position.x + ctx.canvas.width - FIGHTER_DEFAULT_WIDTH
     ) {
       this.position.x =
-        camera.position.x + ctx.canvas.width - this.boxes.push.width;
+        camera.position.x + ctx.canvas.width - FIGHTER_DEFAULT_WIDTH;
       this.resetSlide(true);
     }
 
-    if (this.position.x < camera.position.x + this.boxes.push.width) {
-      this.position.x = camera.position.x + this.boxes.push.width;
+    if (this.position.x < camera.position.x + FIGHTER_DEFAULT_WIDTH) {
+      this.position.x = camera.position.x + FIGHTER_DEFAULT_WIDTH;
       this.resetSlide(true);
     }
 
@@ -723,7 +724,7 @@ export class Fighter {
           this.opponent.position.x +
             this.opponent.boxes.push.x -
             (this.boxes.push.x + this.boxes.push.width),
-          camera.position.x + this.boxes.push.width
+          camera.position.x + FIGHTER_DEFAULT_WIDTH
         );
 
         if (
@@ -745,7 +746,7 @@ export class Fighter {
             this.opponent.boxes.push.x +
             this.opponent.boxes.push.width +
             (this.boxes.push.width + this.boxes.push.x),
-          camera.position.x + ctx.canvas.width - this.boxes.push.width
+          camera.position.x + ctx.canvas.width - FIGHTER_DEFAULT_WIDTH
         );
 
         if (
