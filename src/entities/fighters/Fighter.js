@@ -23,11 +23,7 @@ import {
   getActualBoxDimensions,
   rectsOverlap,
 } from "../../utils/collisions.js";
-import { gameState } from "../../state/gameState.js";
-import {
-  DEBUG_drawCollisionInfo,
-  DEBUG_logHit,
-} from "../../utils/fighterDebug.js";
+import * as DEBUG from "../../utils/fighterDebug.js";
 import { playSound, stopSound } from "../../engine/soundHandler.js";
 
 export class Fighter {
@@ -701,12 +697,7 @@ export class Fighter {
     this.slideFriction = friction;
     this.changeState(newState);
 
-    // DEBUG_logHit(this, attackStrength, hitLocation);
-    console.log(
-      `${gameState.fighters[this.playerId].id} has hit ${
-        gameState.fighters[this.opponent.playerId].id
-      }'s ${hitLocation} with a ${attackStrength} attack!`
-    );
+    DEBUG.logHit(this, attackStrength, hitLocation);
   }
 
   // Updates
@@ -922,6 +913,6 @@ export class Fighter {
     );
     ctx.setTransform(1, 0, 0, 1, 0, 0);
 
-    DEBUG_drawCollisionInfo(this, ctx, camera);
+    DEBUG.drawCollisionInfo(this, ctx, camera);
   }
 }

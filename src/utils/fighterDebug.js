@@ -1,3 +1,5 @@
+import { gameState } from "../../src/state/gameState.js";
+
 function drawCross(ctx, camera, position, color) {
   ctx.beginPath();
   ctx.strokeStyle = color;
@@ -45,7 +47,7 @@ function drawBox(ctx, camera, position, direction, dimensions, color) {
   ctx.stroke();
 }
 
-export function DEBUG_drawCollisionInfo(fighter, ctx, camera) {
+export function drawCollisionInfo(fighter, ctx, camera) {
   const { position, direction, boxes } = fighter;
 
   ctx.lineWidth = 1;
@@ -79,10 +81,10 @@ export function DEBUG_drawCollisionInfo(fighter, ctx, camera) {
   drawCross(ctx, camera, position, "#FFFFFF");
 }
 
-export function DEBUG_logHit(fighter, hitStrength, hitLocation) {
-  //   console.log(
-  //     `${gameState.fighters[fighter.playerId].id} has hit ${
-  //       gameState.fighters[fighter.opponent.playerId].id
-  //     }'s ${hitLocation} with a ${hitStrength} attack!`
-  //   );
+export function logHit(fighter, hitStrength, hitLocation) {
+  console.log(
+    `${gameState.fighters[fighter.playerId].id} has hit ${
+      gameState.fighters[fighter.opponent.playerId].id
+    }'s ${hitLocation} with a ${hitStrength} attack!`
+  );
 }
