@@ -3,6 +3,10 @@ import {
   FireballState,
 } from "../../../constants/fireball.js";
 import { FRAME_TIME } from "../../../constants/game.js";
+import {
+  getActualBoxDimensions,
+  boxOverlap,
+} from "../../../utils/collisions.js";
 
 // prettier-ignore
 const frames = new Map([
@@ -47,7 +51,40 @@ export class Fireball {
     this.animationTimer = time.previous;
   }
 
+  hasCollidedWithOpponent() {
+    const [x, y, width, height] = frames.get(
+      animations[this.state][this.animationFrame][0]
+    )[1];
+    const actualHitBox = getActualBoxDimensions(this.position, this.direction, {
+      x,
+      y,
+      width,
+      height,
+    });
+
+    for (const [, hurtBox] of Object.entries(
+      this.fighter.opponent.boxes.hurt
+    )) {
+      const [x, y, width, height] = hurtBox;
+      const actualOpponentHurtBox = getActualBoxDimensions(
+        this.fighter.opponent.position,
+        this.fighter.opponent.direction,
+        { x, y, width, height }
+      );
+
+      if (boxOverlap(actualHitBox, actualOpponentHurtBox)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   updateMovement(time, camera) {
+    if (this.state !== FireballState.ACTIVE) {
+      return;
+    }
+
     this.position.x += this.velocity * this.direction * time.secondsPassed;
 
     if (
@@ -56,6 +93,17 @@ export class Fireball {
     ) {
       this.onEnd(this);
     }
+
+    const hasCollided = this.hasCollidedWithOpponent();
+    if (!hasCollided) {
+      return;
+    }
+
+    this.state = FireballState.COLLIDED;
+    this.animationFrame = 0;
+    this.animationTimer =
+      time.previous +
+      animations[this.state][this.animationFrame][1] * FRAME_TIME;
   }
 
   updateAnimation(time) {
@@ -66,6 +114,9 @@ export class Fireball {
     this.animationFrame += 1;
     if (this.animationFrame >= animations[this.state].length) {
       this.animationFrame = 0;
+      if (this.state === FireballState.COLLIDED) {
+        this.onEnd(this);
+      }
     }
 
     this.animationTimer =
