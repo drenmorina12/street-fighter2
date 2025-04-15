@@ -6,9 +6,11 @@ import {
   HurtBox,
   FIGHTER_HURT_DELAY,
 } from "../../constants/fighter.js";
+import { playSound } from "../../engine/soundHandler.js";
 
 export class Ryu extends Fighter {
   image = document.querySelector('img[alt="ryu"]');
+  voiceHadouken = document.querySelector("audio#sound-ryu-voice-hadouken");
 
   // prettier-ignore
   frames = new Map([
@@ -293,7 +295,7 @@ export class Ryu extends Fighter {
       ["special-2", 8],
       ["special-3", 2],
       ["special-4", 40],
-      ["special-5", FrameDelay.TRANSITION],
+      ["special-4", FrameDelay.TRANSITION],
     ],
   };
 
@@ -313,6 +315,7 @@ export class Ryu extends Fighter {
     this.states[FighterState.SPECIAL_1] = {
       init: this.handleHadoukenInit.bind(this),
       update: this.handleHadoukenState.bind(this),
+      shadow: [1.6, 1, 22, 0],
       validFrom: [
         FighterState.IDLE,
         FighterState.WALK_FORWARDS,
@@ -331,6 +334,7 @@ export class Ryu extends Fighter {
 
   handleHadoukenInit() {
     this.resetVelocities();
+    playSound(this.voiceHadouken);
   }
 
   handleHadoukenState(time) {
