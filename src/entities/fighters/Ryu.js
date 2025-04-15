@@ -7,6 +7,8 @@ import {
   FIGHTER_HURT_DELAY,
 } from "../../constants/fighter.js";
 import { playSound } from "../../engine/soundHandler.js";
+import { Fireball } from "./special/Fireball.js";
+import { Control } from "../../constants/control.js";
 
 export class Ryu extends Fighter {
   image = document.querySelector('img[alt="ryu"]');
@@ -310,8 +312,13 @@ export class Ryu extends Fighter {
   };
   gravity = 1000;
 
-  constructor(playerId, onAttackHit) {
+  fireball = { fired: false, strength: undefined };
+
+  constructor(playerId, onAttackHit, addEntity) {
     super(playerId, onAttackHit);
+
+    this.addEntity = addEntity;
+
     this.states[FighterState.SPECIAL_1] = {
       init: this.handleHadoukenInit.bind(this),
       update: this.handleHadoukenState.bind(this),
@@ -335,9 +342,15 @@ export class Ryu extends Fighter {
   handleHadoukenInit() {
     this.resetVelocities();
     playSound(this.voiceHadouken);
+    this.fireball = { fired: false, strength: Control.MEDIUM_PUNCH };
   }
 
   handleHadoukenState(time) {
+    if (!this.fireball.fired && this.animationFrame === 3) {
+      this.fireball.fired = true;
+      this.addEntity(Fireball, this, this.fireball.strength, time);
+    }
+
     if (!this.isAnimationCompleted()) {
       return;
     }
