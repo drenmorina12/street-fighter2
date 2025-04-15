@@ -114,6 +114,12 @@ export class Ken extends Fighter {
       ['stun-1', [[[149, 3370, 77, 87], [28, 85]], PushBox.IDLE, [[8, -87, 28, 18], [-16, -75, 40, 46], [-26, -31, 40, 32]]]], 
       ['stun-2', [[[77, 3368, 65, 89], [28, 87]], PushBox.IDLE, [[-9, -89, 28, 18], [-23, -75, 40, 46], [-26, -31, 40, 32]]]], 
       ['stun-3', [[[1, 3367, 67, 90], [35, 88]], PushBox.IDLE, [[-22, -91, 28, 18], [-30, -72, 42, 40], [-26, -31, 40, 32]]]],
+
+      // Hadouken
+      ['special-1', [[[3, 2741, 74, 90], [28, 89]], PushBox.IDLE, HurtBox.IDLE]], 
+      ['special-2', [[[91, 2747, 85, 83], [25, 83]], PushBox.IDLE, HurtBox.IDLE]], 
+      ['special-3', [[[188, 2750, 90, 81], [25, 80]], PushBox.IDLE, HurtBox.IDLE]],
+      ['special-4', [[[293, 2754, 106, 77], [23, 76]], PushBox.IDLE, [[38, -79, 26, 18], [21, -65, 40, 38], [-12, -30, 78, 30]]]],
     ]);
 
     this.animations = {
@@ -284,6 +290,13 @@ export class Ken extends Fighter {
         ["hit-stomach-4", 4],
         ["stun-3", 9],
         ["stun-3", FrameDelay.TRANSITION],
+      ],
+      [FighterState.SPECIAL_1]: [
+        ["special-1", 2],
+        ["special-2", 8],
+        ["special-3", 2],
+        ["special-4", 40],
+        ["special-5", FrameDelay.TRANSITION],
       ],
     };
 
