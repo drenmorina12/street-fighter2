@@ -1,4 +1,5 @@
-export function playSound(sound, volume = 1) {
+export function playSound(sound, volume = 0.1) {
+  // Reduce volume for now 1 => 0.1
   sound.volume = volume;
 
   if (!sound.paused && sound.currentTime > 0) {

@@ -819,7 +819,7 @@ export class Fighter {
       }
 
       stopSound(this.soundAttacks[attackStrength]);
-      playSound(this.soundHits[attackStrength][attackType], 0.8);
+      playSound(this.soundHits[attackStrength][attackType]);
 
       const strength = this.states[this.currentState].attackStrength;
 
