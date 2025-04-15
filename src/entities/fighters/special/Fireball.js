@@ -1,4 +1,9 @@
 import {
+  FighterAttackStrength,
+  FighterAttackType,
+  FighterHurtBox,
+} from "../../../constants/fighter.js";
+import {
   fireballVelocity,
   FireballState,
 } from "../../../constants/fireball.js";
@@ -7,6 +12,7 @@ import {
   getActualBoxDimensions,
   boxOverlap,
 } from "../../../utils/collisions.js";
+import { Fighter } from "../Fighter.js";
 
 // prettier-ignore
 const frames = new Map([
@@ -104,6 +110,14 @@ export class Fireball {
     this.animationTimer =
       time.previous +
       animations[this.state][this.animationFrame][1] * FRAME_TIME;
+
+    this.fighter.opponent.handleAttackHit(
+      time,
+      FighterAttackStrength.HEAVY,
+      FighterAttackType.PUNCH,
+      undefined,
+      FighterHurtBox.HEAD
+    );
   }
 
   updateAnimation(time) {

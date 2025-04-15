@@ -705,15 +705,25 @@ export class Fighter {
     this.changeState(FighterState.IDLE, time);
   }
 
-  handleAttackHit(time, attackStrength, hitLocation) {
-    const newState = this.getHitState(attackStrength, hitLocation);
+  handleAttackHit(time, attackStrength, attackType, hitPosition, hurtLocation) {
+    const newState = this.getHitState(attackStrength, hurtLocation);
     const { velocity, friction } = FighterAttackBaseData[attackStrength].slide;
 
     this.slideVelocity = velocity;
     this.slideFriction = friction;
+    this.attackStruck = true;
+
+    playSound(this.soundHits[attackStrength][attackType]);
+    this.onAttackHit(
+      time,
+      this.opponent.playerId,
+      this.playerId,
+      hitPosition,
+      attackStrength
+    );
     this.changeState(newState, time);
 
-    DEBUG.logHit(this, attackStrength, hitLocation);
+    DEBUG.logHit(this, attackStrength, hurtLocation);
   }
 
   // Updates
@@ -819,9 +829,6 @@ export class Fighter {
       }
 
       stopSound(this.soundAttacks[attackStrength]);
-      playSound(this.soundHits[attackStrength][attackType]);
-
-      const strength = this.states[this.currentState].attackStrength;
 
       const hitPosition = {
         x:
@@ -841,16 +848,14 @@ export class Fighter {
       hitPosition.x -= 4 - Math.random() * 8;
       hitPosition.y -= 4 - Math.random() * 8;
 
-      this.onAttackHit(
+      this.opponent.handleAttackHit(
         time,
-        this.playerId,
-        this.opponent.playerId,
+        attackStrength,
+        attackType,
         hitPosition,
-        strength
+        hurtLocation
       );
-      this.opponent.handleAttackHit(time, attackStrength, hurtLocation);
 
-      this.attackStruck = true;
       return;
     }
   }

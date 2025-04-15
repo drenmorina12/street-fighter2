@@ -103,7 +103,10 @@ export class BattleScene {
       FighterAttackBaseData[strength].damage;
 
     this.hurtTimer = time.previous + FIGHTER_HURT_DELAY * FRAME_TIME;
-    this.fighterDrawOrder = [opponentId, playerId]; // The attacker will be after before the opponent
+    this.fighterDrawOrder = [opponentId, playerId]; // The attacker will be drawn before the opponent
+    if (!position) {
+      return;
+    }
 
     this.addEntity(
       this.getHitSplashClass(strength),
