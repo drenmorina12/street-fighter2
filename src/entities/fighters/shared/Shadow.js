@@ -19,6 +19,7 @@ export class Shadow {
       const [scaleX, scaleY, offsetX, offsetY] =
         this.fighter.states[this.fighter.currentState].shadow;
       return [scaleX, scaleY, -offsetX * this.fighter.direction, offsetY];
+      // Normaly should be +offsetX, but only works properly with -offsetX now
     }
 
     return [1, 1];
