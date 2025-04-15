@@ -12,7 +12,7 @@ export class Camera {
     this.fighters = fighters;
   }
 
-  update(time, ctx) {
+  update(_, ctx) {
     this.position.y =
       -6 +
       Math.floor(
@@ -33,15 +33,14 @@ export class Camera {
       this.position.x = lowX + midPoint - ctx.canvas.width / 2;
     } else {
       for (const fighter of this.fighters) {
-        if (
-          (fighter.position.x < this.position.x + SCROLL_BOUNDRY &&
-            fighter.velocity.x * fighter.direction < 0) ||
-          (fighter.position.x >
-            this.position.x + ctx.canvas.width - SCROLL_BOUNDRY &&
-            fighter.velocity.x * fighter.direction > 0)
+        if (fighter.position.x < this.position.x + SCROLL_BOUNDRY) {
+          this.position.x = fighter.position.x - SCROLL_BOUNDRY;
+        } else if (
+          fighter.position.x >
+          this.position.x + ctx.canvas.width - SCROLL_BOUNDRY
         ) {
-          this.position.x +=
-            fighter.velocity.x * fighter.direction * time.secondsPassed;
+          this.position.x =
+            fighter.position.x - ctx.canvas.width + SCROLL_BOUNDRY;
         }
       }
     }
