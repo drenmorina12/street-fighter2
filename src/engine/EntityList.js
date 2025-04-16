@@ -1,8 +1,8 @@
 export class EntityList {
   entities = [];
 
-  add(EntityClass, ...args) {
-    this.entities.push(new EntityClass(...args, this.removeEntity.bind(this)));
+  add(EntityClass, time, ...args) {
+    this.entities.push(new EntityClass(args, time, this));
   }
 
   remove(entity) {

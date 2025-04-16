@@ -18,17 +18,18 @@ import {
   Shadow,
 } from "../entities/fighters/shared/index.js";
 import { FRAME_TIME } from "../constants/game.js";
+import { EntityList } from "../engine/EntityList.js";
 
 export class BattleScene {
   fighters = [];
   camera = undefined;
   shadows = [];
-  entities = [];
   hurtTimer = undefined;
   fighterDrawOrder = [0, 1];
 
   constructor() {
     this.stage = new KenStage();
+    this.entities = new EntityList();
 
     this.overlays = [new StatusBar(this.fighters), new FpsCounter()];
 
@@ -52,7 +53,7 @@ export class BattleScene {
     return new FighterEntityClass(
       index,
       this.handleAttackHit.bind(this),
-      this.addEntity.bind(this)
+      this.entities
     );
   }
 
@@ -80,21 +81,6 @@ export class BattleScene {
     }
   }
 
-  addEntity(EntityClass, ...args) {
-    this.entities.push(new EntityClass(...args, this.removeEntity.bind(this)));
-  }
-
-  removeEntity(entity) {
-    const index = this.entities.indexOf(entity);
-
-    if (index < 0) {
-      return;
-    }
-
-    this.entities.splice(index, 1);
-    // this.entities = this.entities.filter((thisEntity) => thisEntity !== entity);
-  }
-
   handleAttackHit(time, playerId, opponentId, position, strength) {
     gameState.fighters[opponentId].score +=
       FighterAttackBaseData[strength].score;
@@ -108,8 +94,9 @@ export class BattleScene {
       return;
     }
 
-    this.addEntity(
+    this.entities.add(
       this.getHitSplashClass(strength),
+      time,
       position.x,
       position.y,
       playerId
@@ -144,12 +131,6 @@ export class BattleScene {
     }
   }
 
-  updateEntities(time, ctx) {
-    for (const entity of this.entities) {
-      entity.update(time, ctx, this.camera);
-    }
-  }
-
   updateOverlays(time, ctx) {
     for (const overlay of this.overlays) {
       overlay.update(time, ctx, this.camera);
@@ -160,7 +141,7 @@ export class BattleScene {
     this.updateFighters(time, ctx);
     this.updateShadows(time, ctx);
     this.stage.update(time);
-    this.updateEntities(time, ctx);
+    this.entities.update(time, ctx, this.camera);
     this.camera.update(time, ctx);
     this.updateOverlays(time, ctx);
   }
@@ -177,12 +158,6 @@ export class BattleScene {
     }
   }
 
-  drawEntities(ctx) {
-    for (const entity of this.entities) {
-      entity.draw(ctx, this.camera);
-    }
-  }
-
   drawOverlays(ctx) {
     for (const overlay of this.overlays) {
       overlay.draw(ctx, this.camera);
@@ -193,7 +168,7 @@ export class BattleScene {
     this.stage.drawBackground(ctx, this.camera);
     this.drawShadows(ctx);
     this.drawFighters(ctx);
-    this.drawEntities(ctx);
+    this.entities.draw(ctx, this.camera);
     this.stage.drawForeground(ctx, this.camera);
     this.drawOverlays(ctx);
   }

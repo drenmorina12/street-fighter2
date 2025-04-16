@@ -314,10 +314,10 @@ export class Ken extends Fighter {
 
   fireball = { fired: false, strength: undefined };
 
-  constructor(playerId, onAttackHit, addEntity) {
+  constructor(playerId, onAttackHit, entityList) {
     super(playerId, onAttackHit);
 
-    this.addEntity = addEntity;
+    this.entityList = entityList;
 
     this.states[FighterState.SPECIAL_1] = {
       init: this.handleHadoukenInit.bind(this),
@@ -348,7 +348,13 @@ export class Ken extends Fighter {
   handleHadoukenState(time) {
     if (!this.fireball.fired && this.animationFrame === 3) {
       this.fireball.fired = true;
-      this.addEntity(Fireball, this, this.fireball.strength, time);
+      this.entityList.add.call(
+        this.entityList,
+        Fireball,
+        time,
+        this,
+        this.fireball.strength
+      );
     }
 
     if (!this.isAnimationCompleted()) {
