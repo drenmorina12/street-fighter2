@@ -1,3 +1,4 @@
+import { HEALTH_CRITICAL_HIT_POINTS } from "../../../constants/battle.js";
 import {
   FighterAttackStrength,
   FighterAttackType,
@@ -6,6 +7,7 @@ import {
 import {
   fireballVelocity,
   FireballState,
+  FireballCollidedState,
 } from "../../../constants/fireball.js";
 import { FRAME_TIME } from "../../../constants/game.js";
 import {
@@ -45,9 +47,11 @@ export class Fireball {
   animationFrame = 0;
   state = FireballState.ACTIVE;
 
-  constructor(fighter, strength, time, onEnd) {
+  constructor(args, time, entityList) {
+    const [fighter, strength] = args;
+
     this.fighter = fighter;
-    this.onEnd = onEnd;
+    this.entityList = entityList;
     this.velocity = fireballVelocity[strength];
     this.direction = this.fighter.direction;
     this.position = {
@@ -57,17 +61,7 @@ export class Fireball {
     this.animationTimer = time.previous;
   }
 
-  hasCollidedWithOpponent() {
-    const [x, y, width, height] = frames.get(
-      animations[this.state][this.animationFrame][0]
-    )[1];
-    const actualHitBox = getActualBoxDimensions(this.position, this.direction, {
-      x,
-      y,
-      width,
-      height,
-    });
-
+  hasCollidedWithOpponent(hitBox) {
     for (const [, hurtBox] of Object.entries(
       this.fighter.opponent.boxes.hurt
     )) {
@@ -78,12 +72,57 @@ export class Fireball {
         { x, y, width, height }
       );
 
-      if (boxOverlap(actualHitBox, actualOpponentHurtBox)) {
-        return true;
+      if (boxOverlap(hitBox, actualOpponentHurtBox)) {
+        return FireballCollidedState.OPPONENT;
       }
     }
+  }
 
-    return false;
+  hasCollidedWithOtherFireball(hitBox) {
+    const otherFireballs = this.entityList.entities.filter(
+      (fireball) => fireball instanceof Fireball && fireball !== this
+    );
+
+    if (otherFireballs.length === 0) {
+      return;
+    }
+
+    for (const fireball of otherFireballs) {
+      const [x, y, width, height] = frames.get(
+        animations[fireball.state][fireball.animationFrame][0]
+      )[1];
+      const otherActualHitBox = getActualBoxDimensions(
+        fireball.position,
+        fireball.direction,
+        {
+          x,
+          y,
+          width,
+          height,
+        }
+      );
+
+      if (boxOverlap(hitBox, otherActualHitBox)) {
+        return FireballCollidedState.FIREBALL;
+      }
+    }
+  }
+
+  hasCollided() {
+    const [x, y, width, height] = frames.get(
+      animations[this.state][this.animationFrame][0]
+    )[1];
+    const actualHitBox = getActualBoxDimensions(this.position, this.direction, {
+      x,
+      y,
+      width,
+      height,
+    });
+
+    return (
+      this.hasCollidedWithOpponent(actualHitBox) ??
+      this.hasCollidedWithOtherFireball(actualHitBox)
+    );
   }
 
   updateMovement(time, camera) {
@@ -97,10 +136,10 @@ export class Fireball {
       this.position.x - camera.position.x > 384 + 56 ||
       this.position.x - camera.position.x < -56
     ) {
-      this.onEnd(this);
+      this.entityList.remove(this);
     }
 
-    const hasCollided = this.hasCollidedWithOpponent();
+    const hasCollided = this.hasCollided();
     if (!hasCollided) {
       return;
     }
@@ -110,6 +149,10 @@ export class Fireball {
     this.animationTimer =
       time.previous +
       animations[this.state][this.animationFrame][1] * FRAME_TIME;
+
+    if (hasCollided !== FireballCollidedState.OPPONENT) {
+      return;
+    }
 
     this.fighter.opponent.handleAttackHit(
       time,
@@ -129,7 +172,7 @@ export class Fireball {
     if (this.animationFrame >= animations[this.state].length) {
       this.animationFrame = 0;
       if (this.state === FireballState.COLLIDED) {
-        this.onEnd(this);
+        this.entityList.remove(this);
       }
     }
 
