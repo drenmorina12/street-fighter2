@@ -1,6 +1,6 @@
-import { Control } from "../constants/control";
-import { SpecialMoveDirection } from "../constants/fighter";
-import * as control from "./InputHandler";
+import { Control } from "../constants/control.js";
+import { SpecialMoveDirection } from "../constants/fighter.js";
+import * as control from "./InputHandler.js";
 
 const HISTORY_CAP = 10;
 
@@ -83,7 +83,11 @@ export function pollControl(time, id, direction) {
     return;
   }
 
-  constrolHistory[id].unshift[currentControlSnapshot];
+  if (id === 0) {
+    console.log(currentControlSnapshot);
+  }
+
+  constrolHistory[id].unshift(currentControlSnapshot);
   if (constrolHistory[id].length >= HISTORY_CAP) {
     constrolHistory[id].pop();
   }

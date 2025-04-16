@@ -19,6 +19,7 @@ import {
 } from "../entities/fighters/shared/index.js";
 import { FRAME_TIME } from "../constants/game.js";
 import { EntityList } from "../engine/EntityList.js";
+import { pollControl } from "../engine/controlHistory.js";
 
 export class BattleScene {
   fighters = [];
@@ -117,6 +118,8 @@ export class BattleScene {
 
   updateFighters(time, ctx) {
     for (const fighter of this.fighters) {
+      pollControl(time, fighter.playerId, fighter.direction);
+
       if (time.previous < this.hurtTimer) {
         fighter.updateHurtShake(time, this.hurtTimer);
       } else {
