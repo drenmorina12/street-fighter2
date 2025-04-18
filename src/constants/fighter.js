@@ -172,3 +172,8 @@ export const SpecialMoveDirection = {
   BACKWARD_DOWN: "backward-down",
   NONE: "none",
 };
+
+export const SpecialMoveButton = {
+  ANY_PUNCH: "any-punch",
+  ANY_KICK: "any-kick",
+};

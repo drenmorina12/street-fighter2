@@ -6,6 +6,10 @@ import {
 import { getContext } from "./utils/context.js";
 import { BattleScene } from "./scenes/BattleScene.js";
 
+// TO-DO:
+// Fix Input history to properly store button pressed
+// At handleHadoukenInit, fix it to work with new strength property coming from parameter
+
 export class StreetFighterGame {
   ctx = getContext();
 

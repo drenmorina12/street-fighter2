@@ -5,6 +5,8 @@ import {
   FrameDelay,
   HurtBox,
   FIGHTER_HURT_DELAY,
+  SpecialMoveDirection,
+  SpecialMoveButton,
 } from "../../constants/fighter.js";
 import { playSound } from "../../engine/soundHandler.js";
 import { Fireball } from "./special/Fireball.js";
@@ -310,6 +312,19 @@ export class Ken extends Fighter {
     },
     jump: -420,
   };
+
+  specialMoves = [
+    {
+      state: FighterState.SPECIAL_1,
+      sequence: [
+        SpecialMoveDirection.DOWN,
+        SpecialMoveDirection.FORWARD,
+        // SpecialMoveButton.ANY_PUNCH,
+      ],
+      cursor: 0,
+    },
+  ];
+
   gravity = 1000;
 
   fireball = { fired: false, strength: undefined };
@@ -339,10 +354,10 @@ export class Ken extends Fighter {
     ];
   }
 
-  handleHadoukenInit() {
+  handleHadoukenInit(_, strength) {
     this.resetVelocities();
     playSound(this.voiceHadouken);
-    this.fireball = { fired: false, strength: Control.MEDIUM_PUNCH };
+    this.fireball = { fired: false, strength: Control.LIGHT_PUNCH };
   }
 
   handleHadoukenState(time) {

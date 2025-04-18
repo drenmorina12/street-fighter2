@@ -26,6 +26,7 @@ import {
 } from "../../utils/collisions.js";
 import * as DEBUG from "../../utils/fighterDebug.js";
 import { playSound, stopSound } from "../../engine/soundHandler.js";
+import { hasSpecialMoveBeenExecuted } from "../../engine/controlHistory.js";
 
 export class Fighter {
   frames = new Map();
@@ -405,7 +406,7 @@ export class Fighter {
     this.animationTimer = time.previous + frameDelay * FRAME_TIME;
   }
 
-  changeState(newState, time) {
+  changeState(newState, time, args) {
     if (!this.states[newState].validFrom.includes(this.currentState)) {
       console.warn(
         `Illegal transition from ${this.currentState} to ${newState}`
@@ -416,7 +417,7 @@ export class Fighter {
     this.currentState = newState;
     this.setAnimationFrame(0, time);
 
-    this.states[this.currentState].init(time);
+    this.states[this.currentState].init(time, args);
   }
 
   // Handle Inits
@@ -471,8 +472,8 @@ export class Fighter {
     } else if (control.isForward(this.playerId, this.direction)) {
       this.changeState(FighterState.WALK_FORWARDS, time);
     } else if (control.isLightPunch(this.playerId)) {
-      this.changeState(FighterState.SPECIAL_1, time);
-      // this.changeState(FighterState.LIGHT_PUNCH, time);
+      // this.changeState(FighterState.SPECIAL_1, time);
+      this.changeState(FighterState.LIGHT_PUNCH, time);
     } else if (control.isMediumPunch(this.playerId)) {
       this.changeState(FighterState.MEDIUM_PUNCH, time);
     } else if (control.isHeavyPunch(this.playerId)) {
@@ -886,6 +887,20 @@ export class Fighter {
     this.resetSlide();
   }
 
+  updateSpecialMoves(time) {
+    for (const specialMove of this.specialMoves) {
+      const resultArgs = hasSpecialMoveBeenExecuted(
+        specialMove,
+        this.playerId,
+        time
+      );
+
+      if (resultArgs) {
+        this.changeState(specialMove.state, time, resultArgs);
+      }
+    }
+  }
+
   updatePosition(time) {
     this.position.x +=
       (this.velocity.x + this.slideVelocity) *
@@ -896,6 +911,7 @@ export class Fighter {
 
   update(time, ctx, camera) {
     this.states[this.currentState].update(time, ctx);
+    this.updateSpecialMoves(time);
     this.updateSlide(time);
     this.updatePosition(time);
     this.updateAnimation(time);

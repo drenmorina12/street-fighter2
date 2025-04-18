@@ -1,10 +1,14 @@
 import { Control } from "../constants/control.js";
-import { SpecialMoveDirection } from "../constants/fighter.js";
+import {
+  SpecialMoveButton,
+  SpecialMoveDirection,
+} from "../constants/fighter.js";
 import * as control from "./InputHandler.js";
 
 const HISTORY_CAP = 10;
+const MOVE_DELAY = 150;
 
-export const constrolHistory = [
+export const controlHistory = [
   [
     {
       time: 0,
@@ -65,8 +69,8 @@ function getCurrentControlSnapshot(time, id, direction) {
 
 function isLastSnapshotDifferent(snapshot, id) {
   if (
-    constrolHistory[id][0].move !== snapshot.move ||
-    constrolHistory[id][0].buttons.some(
+    controlHistory[id][0].move !== snapshot.move ||
+    controlHistory[id][0].buttons.some(
       (button, index) => snapshot.buttons[index] !== button
     )
   ) {
@@ -76,6 +80,30 @@ function isLastSnapshotDifferent(snapshot, id) {
   return false;
 }
 
+function hasControlMatched(control, id) {
+  switch (control) {
+    case SpecialMoveButton.ANY_PUNCH:
+      for (let buttonIndex = 3; buttonIndex < 6; buttonIndex++) {
+        if (controlHistory[id][0].buttons[buttonIndex]) {
+          return buttonOrder[buttonIndex];
+        }
+      }
+      break;
+    case SpecialMoveButton.ANY_KICK:
+      for (let buttonIndex = 0; buttonIndex < 3; buttonIndex++) {
+        if (controlHistory[id][0].buttons[buttonIndex]) {
+          return buttonOrder[buttonIndex];
+        }
+      }
+      break;
+
+    default:
+      if (control === controlHistory[id][0].move) {
+        return true;
+      }
+  }
+}
+
 export function pollControl(time, id, direction) {
   const currentControlSnapshot = getCurrentControlSnapshot(time, id, direction);
 
@@ -83,12 +111,37 @@ export function pollControl(time, id, direction) {
     return;
   }
 
-  if (id === 0) {
-    console.log(currentControlSnapshot);
+  // if (id === 0) {
+  //   console.log(currentControlSnapshot);
+  // }
+
+  controlHistory[id].unshift(currentControlSnapshot);
+  if (controlHistory[id].length >= HISTORY_CAP) {
+    controlHistory[id].pop();
+  }
+}
+
+export function hasSpecialMoveBeenExecuted(specialMove, id, time) {
+  const controlMatched = hasControlMatched(
+    specialMove.sequence[specialMove.cursor],
+    id
+  );
+
+  if (!controlMatched) {
+    if (
+      controlHistory[id][0].time + MOVE_DELAY < time.previous &&
+      specialMove.cursor > 1
+    ) {
+      specialMove.cursor = 0;
+    }
+    return false;
   }
 
-  constrolHistory[id].unshift(currentControlSnapshot);
-  if (constrolHistory[id].length >= HISTORY_CAP) {
-    constrolHistory[id].pop();
+  if (specialMove.cursor === specialMove.sequence.length - 1) {
+    specialMove.cursor = 0;
+    return controlMatched;
   }
+
+  specialMove.cursor += 1;
+  return false;
 }
