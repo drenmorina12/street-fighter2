@@ -11,7 +11,11 @@ import {
   FighterAttackBaseData,
   FIGHTER_DEFAULT_WIDTH,
 } from "../../constants/fighter.js";
-import { FRAME_TIME } from "../../constants/game.js";
+import {
+  ENABLE_DEBUG,
+  FRAME_TIME,
+  SCREEN_WIDTH,
+} from "../../constants/game.js";
 import { FighterState } from "../../constants/fighter.js";
 import {
   STAGE_FLOOR,
@@ -724,6 +728,8 @@ export class Fighter {
     );
     this.changeState(newState, time);
 
+    if (!ENABLE_DEBUG) return;
+
     DEBUG.logHit(this, attackStrength, hurtLocation);
   }
 
@@ -732,10 +738,10 @@ export class Fighter {
   updateStageConstraints(time, ctx, camera) {
     if (
       this.position.x >
-      camera.position.x + ctx.canvas.width - FIGHTER_DEFAULT_WIDTH
+      camera.position.x + SCREEN_WIDTH - FIGHTER_DEFAULT_WIDTH
     ) {
       this.position.x =
-        camera.position.x + ctx.canvas.width - FIGHTER_DEFAULT_WIDTH;
+        camera.position.x + SCREEN_WIDTH - FIGHTER_DEFAULT_WIDTH;
       this.resetSlide(true);
     }
 
@@ -772,7 +778,7 @@ export class Fighter {
             this.opponent.boxes.push.x +
             this.opponent.boxes.push.width +
             (this.boxes.push.width + this.boxes.push.x),
-          camera.position.x + ctx.canvas.width - FIGHTER_DEFAULT_WIDTH
+          camera.position.x + SCREEN_WIDTH - FIGHTER_DEFAULT_WIDTH
         );
 
         if (
@@ -939,6 +945,8 @@ export class Fighter {
       height
     );
     ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+    if (!ENABLE_DEBUG) return;
 
     DEBUG.drawCollisionInfo(this, ctx, camera);
   }

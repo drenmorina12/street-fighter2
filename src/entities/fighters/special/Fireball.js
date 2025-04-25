@@ -9,12 +9,12 @@ import {
   FireballState,
   FireballCollidedState,
 } from "../../../constants/fireball.js";
-import { FRAME_TIME } from "../../../constants/game.js";
+import { ENABLE_DEBUG, FRAME_TIME } from "../../../constants/game.js";
 import {
   getActualBoxDimensions,
   boxOverlap,
 } from "../../../utils/collisions.js";
-import { Fighter } from "../Fighter.js";
+import * as DEBUG from "../../../utils/entityDebug.js";
 
 // prettier-ignore
 const frames = new Map([
@@ -188,7 +188,8 @@ export class Fireball {
 
   draw(ctx, camera) {
     const [frameKey] = animations[this.state][this.animationFrame];
-    const [[[x, y, width, height], [originX, originY]]] = frames.get(frameKey);
+    const [[[x, y, width, height], [originX, originY]], collisionDimensions] =
+      frames.get(frameKey);
 
     ctx.scale(this.direction, 1);
     ctx.drawImage(
@@ -204,5 +205,17 @@ export class Fireball {
       height
     );
     ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+    if (!ENABLE_DEBUG) return;
+
+    DEBUG.drawBox(
+      ctx,
+      camera,
+      this.position,
+      this.direction,
+      collisionDimensions,
+      "#FF0000"
+    );
+    DEBUG.drawCross(ctx, camera, this.position, "#FFF");
   }
 }

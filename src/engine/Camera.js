@@ -1,3 +1,4 @@
+import { SCREEN_WIDTH } from "../constants/game.js";
 import {
   SCROLL_BOUNDRY,
   STAGE_FLOOR,
@@ -28,19 +29,18 @@ export class Camera {
       this.fighters[0].position.x
     );
 
-    if (highX - lowX > ctx.canvas.width - SCROLL_BOUNDRY * 2) {
+    if (highX - lowX > SCREEN_WIDTH - SCROLL_BOUNDRY * 2) {
       const midPoint = (highX - lowX) / 2;
-      this.position.x = lowX + midPoint - ctx.canvas.width / 2;
+      this.position.x = lowX + midPoint - SCREEN_WIDTH / 2;
     } else {
       for (const fighter of this.fighters) {
         if (fighter.position.x < this.position.x + SCROLL_BOUNDRY) {
           this.position.x = fighter.position.x - SCROLL_BOUNDRY;
         } else if (
           fighter.position.x >
-          this.position.x + ctx.canvas.width - SCROLL_BOUNDRY
+          this.position.x + SCREEN_WIDTH - SCROLL_BOUNDRY
         ) {
-          this.position.x =
-            fighter.position.x - ctx.canvas.width + SCROLL_BOUNDRY;
+          this.position.x = fighter.position.x - SCREEN_WIDTH + SCROLL_BOUNDRY;
         }
       }
     }
@@ -48,8 +48,8 @@ export class Camera {
     if (this.position.x < STAGE_PADDING) {
       this.position.x = STAGE_PADDING;
     }
-    if (this.position.x > STAGE_WIDTH + STAGE_PADDING - ctx.canvas.width) {
-      this.position.x = STAGE_WIDTH + STAGE_PADDING - ctx.canvas.width;
+    if (this.position.x > STAGE_WIDTH + STAGE_PADDING - SCREEN_WIDTH) {
+      this.position.x = STAGE_WIDTH + STAGE_PADDING - SCREEN_WIDTH;
     }
     if (this.position.y < 0) {
       this.position.y = 0;
