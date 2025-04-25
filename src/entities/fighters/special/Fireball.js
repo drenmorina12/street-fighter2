@@ -3,6 +3,7 @@ import {
   FighterAttackStrength,
   FighterAttackType,
   FighterHurtBox,
+  FighterHurtBy,
 } from "../../../constants/fighter.js";
 import {
   fireballVelocity,
@@ -159,7 +160,8 @@ export class Fireball {
       FighterAttackStrength.HEAVY,
       FighterAttackType.PUNCH,
       undefined,
-      FighterHurtBox.HEAD
+      FighterHurtBox.HEAD,
+      FighterHurtBy.FIREBALL
     );
   }
 

@@ -348,10 +348,7 @@ export class Ken extends Fighter {
         FighterState.CROUCH_TURN,
       ],
     };
-    this.states[FighterState.IDLE].validFrom = [
-      ...this.states[FighterState.IDLE].validFrom,
-      FighterState.SPECIAL_1,
-    ];
+    this.states[FighterState.IDLE].validFrom.push(FighterState.SPECIAL_1);
   }
 
   handleHadoukenInit(_, strength) {

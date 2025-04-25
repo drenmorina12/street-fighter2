@@ -33,6 +33,11 @@ export const FighterHurtBox = {
   FEET: "feet",
 };
 
+export const FighterHurtBy = {
+  FIGHTER: "fighter",
+  FIREBALL: "fireball",
+};
+
 export const FighterAttackBaseData = {
   [FighterAttackStrength.LIGHT]: {
     score: 100,

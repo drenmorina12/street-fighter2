@@ -10,6 +10,7 @@ import {
   FIGHTER_HURT_DELAY,
   FighterAttackBaseData,
   FIGHTER_DEFAULT_WIDTH,
+  FighterHurtBy,
 } from "../../constants/fighter.js";
 import {
   ENABLE_DEBUG,
@@ -48,6 +49,7 @@ export class Fighter {
   initialVelocity = {};
   attackStruck = false;
 
+  hurtBy = undefined;
   hurtShake = 0;
   hurtShakeTimer = 0;
   slideVelocity = 0;
@@ -330,7 +332,7 @@ export class Fighter {
   }
 
   resetSlide(transferToOpponent = false) {
-    if (transferToOpponent) {
+    if (transferToOpponent && this.hurtBy === FighterHurtBy.FIGHTER) {
       this.opponent.slideVelocity = this.slideVelocity;
       this.opponent.slideFriction = this.slideFriction;
     }
@@ -706,14 +708,22 @@ export class Fighter {
     }
     this.hurtShake = 0;
     this.hurtShakeTimer = 0;
-
+    this.hurtBy = undefined;
     this.changeState(FighterState.IDLE, time);
   }
 
-  handleAttackHit(time, attackStrength, attackType, hitPosition, hurtLocation) {
+  handleAttackHit(
+    time,
+    attackStrength,
+    attackType,
+    hitPosition,
+    hurtLocation,
+    hurtBy
+  ) {
     const newState = this.getHitState(attackStrength, hurtLocation);
     const { velocity, friction } = FighterAttackBaseData[attackStrength].slide;
 
+    this.hurtBy = hurtBy;
     this.slideVelocity = velocity;
     this.slideFriction = friction;
     this.attackStruck = true;
@@ -860,7 +870,8 @@ export class Fighter {
         attackStrength,
         attackType,
         hitPosition,
-        hurtLocation
+        hurtLocation,
+        FighterHurtBy.FIGHTER
       );
 
       return;
