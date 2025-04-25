@@ -318,8 +318,9 @@ export class Ryu extends Fighter {
       state: FighterState.SPECIAL_1,
       sequence: [
         SpecialMoveDirection.DOWN,
+        // SpecialMoveDirection.BACKWARD,
         SpecialMoveDirection.FORWARD,
-        // SpecialMoveButton.ANY_PUNCH,
+        SpecialMoveButton.ANY_PUNCH,
       ],
       cursor: 0,
     },

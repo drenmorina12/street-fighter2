@@ -319,7 +319,7 @@ export class Ken extends Fighter {
       sequence: [
         SpecialMoveDirection.DOWN,
         SpecialMoveDirection.FORWARD,
-        // SpecialMoveButton.ANY_PUNCH,
+        SpecialMoveButton.ANY_PUNCH,
       ],
       cursor: 0,
     },
@@ -357,7 +357,7 @@ export class Ken extends Fighter {
   handleHadoukenInit(_, strength) {
     this.resetVelocities();
     playSound(this.voiceHadouken);
-    this.fireball = { fired: false, strength: Control.LIGHT_PUNCH };
+    this.fireball = { fired: false, strength };
   }
 
   handleHadoukenState(time) {

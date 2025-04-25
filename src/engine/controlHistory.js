@@ -63,7 +63,7 @@ function getCurrentControlSnapshot(time, id, direction) {
   return {
     time: time.previous,
     move: getMoveDirection(polledControls),
-    buttons: buttonOrder.map((button) => control.isButtonDown(id, button)),
+    buttons: buttonOrder.map((button) => control.isControlDown(id, button)),
   };
 }
 
@@ -111,9 +111,9 @@ export function pollControl(time, id, direction) {
     return;
   }
 
-  // if (id === 0) {
-  //   console.log(currentControlSnapshot);
-  // }
+  if (id === 0) {
+    console.log(currentControlSnapshot);
+  }
 
   controlHistory[id].unshift(currentControlSnapshot);
   if (controlHistory[id].length >= HISTORY_CAP) {
