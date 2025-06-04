@@ -1,3 +1,4 @@
+// Change to true to enable debug boxes
 export const ENABLE_DEBUG = false;
 
 export const FPS = 60;

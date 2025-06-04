@@ -18,6 +18,8 @@ export const controls = [
       [Control.MEDIUM_KICK]: 1,
       [Control.HEAVY_KICK]: 4,
     },
+
+    // Change Player 2 keybinds
     keyboard: {
       [Control.LEFT]: "ArrowLeft",
       [Control.RIGHT]: "ArrowRight",
@@ -48,6 +50,8 @@ export const controls = [
       [Control.MEDIUM_KICK]: 1,
       [Control.HEAVY_KICK]: 4,
     },
+
+    // Change Player 2 keybinds
     keyboard: {
       [Control.LEFT]: "KeyA",
       [Control.RIGHT]: "KeyD",
